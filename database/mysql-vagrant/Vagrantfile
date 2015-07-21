@@ -1,0 +1,44 @@
+# To add a Trusty/Tahr VM:
+# vagrant box add ubuntu/trusty64 https://atlas.hashicorp.com/ubuntu/boxes/trusty64/versions/20150609.0.10/providers/virtualbox.box
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  ## ###########################################################################  
+  ## VM
+  ## ###########################################################################  
+
+  config.vm.box = "ubuntu/trusty64"
+  # config.vm.box = "hashicorp/precise64"
+  # config.vm.box = "official/raring64"
+  # config.vm.box = "official/saucy64"
+
+  ## ###########################################################################  
+  ## PROVISIONING
+  ## ###########################################################################  
+
+  ## Basic system dependencies
+  config.vm.provision :shell, :path => "bootstrap.sh"
+  
+  ## MySQL (check for default root password)
+  config.vm.provision :shell, :path => "bootstrap-mysql.sh"
+    
+  ## ###########################################################################  
+  ## PORT FORWARDING
+  ## ###########################################################################  
+
+  ## MySQL forwarding
+  config.vm.network :forwarded_port, host: 3307, guest: 3306
+
+  ## ###########################################################################  
+  ## VM HARDWARE SETTINGS
+  ## ###########################################################################  
+
+  config.vm.provider "virtualbox" do |v|
+    v.name = "my_vm"
+    v.memory = 512
+    v.cpus = 1
+    v.gui = false
+  end
+end
