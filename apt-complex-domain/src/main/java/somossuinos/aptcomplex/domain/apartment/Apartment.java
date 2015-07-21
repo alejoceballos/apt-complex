@@ -51,7 +51,7 @@ public class Apartment {
     }
 
     @Version
-    @Column
+    @Column(nullable = false)
     private Long version;
 
     protected Apartment() {

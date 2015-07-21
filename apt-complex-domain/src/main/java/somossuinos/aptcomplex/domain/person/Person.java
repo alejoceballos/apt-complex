@@ -50,7 +50,7 @@ public class Person {
     }
 
     @Version
-    @Column
+    @Column(nullable = false)
     private Long version;
 
     protected Person() {

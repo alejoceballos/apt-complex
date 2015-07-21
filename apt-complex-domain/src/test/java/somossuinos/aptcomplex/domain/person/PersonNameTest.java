@@ -70,7 +70,7 @@ public class PersonNameTest {
     }
 
     @Test
-    public void testGetLastNameWithMiddlenameAndBlanks() throws Exception {
+    public void testGetLastNameWithMiddleNameAndBlanks() throws Exception {
         final PersonName pn = new PersonName(" First  Middle   Last ");
         Assert.assertThat(pn.getLastName(), CoreMatchers.is("Last"));
     }

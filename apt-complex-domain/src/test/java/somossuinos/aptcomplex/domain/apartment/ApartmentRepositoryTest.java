@@ -1,7 +1,6 @@
 package somossuinos.aptcomplex.domain.apartment;
 
 import com.google.common.collect.Iterables;
-import java.util.HashSet;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -117,9 +116,8 @@ public class ApartmentRepositoryTest {
 
         int count = 0;
         for (final Apartment apt : originalApts) {
-            final Set<Person> residents = new HashSet<>(2);
-            apt.getResidents().add(new Person(String.format("Jonh %s_1 Doe", ++count)));
-            apt.getResidents().add(new Person(String.format("Jonh %s_2 Doe", ++count)));
+            apt.getResidents().add(new Person(String.format("John %s_1 Doe", ++count)));
+            apt.getResidents().add(new Person(String.format("John %s_2 Doe", ++count)));
         }
 
         final Iterable<Apartment> savedApts = repository.save(originalApts);
@@ -146,9 +144,8 @@ public class ApartmentRepositoryTest {
 
         int count = 0;
         for (final Apartment apt : originalApts) {
-            final Set<Person> residents = new HashSet<>(2);
-            apt.getResidents().add(new Person(String.format("Jonh %s_1 Doe", ++count)));
-            apt.getResidents().add(new Person(String.format("Jonh %s_2 Doe", ++count)));
+            apt.getResidents().add(new Person(String.format("John %s_1 Doe", ++count)));
+            apt.getResidents().add(new Person(String.format("John %s_2 Doe", ++count)));
         }
 
         final Iterable<Apartment> savedApts = repository.save(originalApts);

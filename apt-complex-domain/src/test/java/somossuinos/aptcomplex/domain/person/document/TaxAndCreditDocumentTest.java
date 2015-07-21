@@ -26,7 +26,7 @@ public class TaxAndCreditDocumentTest {
     public void testInstantiateWithWrongNumber() {
         thrown.expect(AptComplexDomainException.class);
         thrown.expectMessage("Invalid document");
-        final TaxAndCreditDocument doc = new TaxAndCreditDocument(WRONG_DOC);
+        new TaxAndCreditDocument(WRONG_DOC);
     }
 
     @Test
