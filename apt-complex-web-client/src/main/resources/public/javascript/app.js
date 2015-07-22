@@ -20,8 +20,7 @@
                 templateUrl: '/javascript/about/about.tpl.html'
             }).
             when('/apartment', {
-                templateUrl: '/javascript/apartment/apartment.tpl.html',
-                controller: 'ApartmentController'
+                templateUrl: '/javascript/apartment/apartment.tpl.html'
             }).
             otherwise({
                 redirectTo: '/about'

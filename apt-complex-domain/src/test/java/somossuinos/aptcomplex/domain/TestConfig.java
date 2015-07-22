@@ -1,4 +1,4 @@
-package somossuinos.aptcomplex;
+package somossuinos.aptcomplex.domain;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 

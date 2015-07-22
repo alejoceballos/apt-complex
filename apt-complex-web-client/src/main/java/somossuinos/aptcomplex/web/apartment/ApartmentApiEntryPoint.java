@@ -1,5 +1,6 @@
 package somossuinos.aptcomplex.web.apartment;
 
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,10 +27,9 @@ public class ApartmentApiEntryPoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public ApiResult get() {
-        final Apartment apartment = service.get(1L);
-        final ApiResult result = ApiResult.build(ApiResultStatusType.SUCCESS).withData(apartment);
+        final List<Apartment> apartments = service.getAll();
 
-        return result;
+        return ApiResult.build(ApiResultStatusType.SUCCESS).withData(apartments);
     }
 
 }

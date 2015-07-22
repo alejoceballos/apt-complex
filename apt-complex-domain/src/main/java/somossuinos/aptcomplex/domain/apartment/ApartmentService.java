@@ -1,5 +1,6 @@
 package somossuinos.aptcomplex.domain.apartment;
 
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.transaction.Transactional;
@@ -15,10 +16,8 @@ public class ApartmentService {
     private ApartmentRepository repository;
 
     @Transactional
-    public Apartment get(final long id) {
-        final Apartment apartment = repository.findOne(1L);
-        apartment.getResidents().size();
-        return apartment;
+    public List<Apartment> getAll() {
+        return repository.findAll();
     }
 
 }
