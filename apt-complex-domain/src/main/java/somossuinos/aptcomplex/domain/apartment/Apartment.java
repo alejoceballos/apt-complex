@@ -1,44 +1,40 @@
 package somossuinos.aptcomplex.domain.apartment;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.jpa.domain.AbstractPersistable;
+import somossuinos.aptcomplex.domain.finance.bill.Bill;
+import somossuinos.aptcomplex.domain.person.Person;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
-import somossuinos.aptcomplex.domain.person.Person;
 
 /**
  * @author ceballos
  * @since 2015-07-17
  */
+@JsonIgnoreProperties( { "new" })
 @Entity
 @Table(name = "apartment")
-public class Apartment {
+public class Apartment extends AbstractPersistable<Long> {
 
-    @Id
-    @Column(nullable = false)
-    private Long id;
-
-    public Long getId() {
-        return id;
+    @Override
+    protected void setId(Long id) {
+        super.setId(id);
     }
 
-    @Column(nullable = false, length = 4)
+    @NotNull
+    @Column(name = "number", nullable = false, length = 4, unique = true)
     private String number;
 
     public String getNumber() {
         return number;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "residence",
             joinColumns = @JoinColumn(name = "apartment_id", nullable = false),
@@ -50,15 +46,68 @@ public class Apartment {
         return residents;
     }
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = "apartment_fee",
+            joinColumns = @JoinColumn(name = "apartment_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "bill_id", nullable = false)
+    )
+    private Set<Bill> fees = new HashSet<>(0);
+
+    public Set<Bill> getFees() {
+        return fees;
+    }
+
+    @NotNull
+    @Column(name = "version", nullable = false)
     @Version
-    @Column(nullable = false)
     private Long version;
 
     protected Apartment() {
     }
 
-    public Apartment(@NotNull final String number) {
-        this.number = number;
+    public static class Builder {
+        private Apartment apartment;
+
+        private Builder() {
+            this.apartment = new Apartment();
+        }
+
+        public static Builder get() {
+            return new Builder();
+        }
+
+        public Apartment build() {
+            return apartment;
+        }
+
+        public Builder withId(final Long id) {
+            apartment.setId(id);
+            return this;
+        }
+
+        public Builder withNumber(final String number) {
+            apartment.number = number;
+            return this;
+        }
+
+        public Builder withResident(final Person resident) {
+            apartment.residents.add(resident);
+            return this;
+        }
+
+        public Builder withFee(final Bill fee) {
+            apartment.fees.add(fee);
+            return this;
+        }
+
+        public Builder withFees(final Set<Bill> fees) {
+            for (Bill fee : fees) {
+                apartment.fees.add(fee);
+            }
+
+            return this;
+        }
     }
 
 }

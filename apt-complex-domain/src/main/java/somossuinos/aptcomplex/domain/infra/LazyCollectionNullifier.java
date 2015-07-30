@@ -2,7 +2,12 @@ package somossuinos.aptcomplex.domain.infra;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.hibernate.collection.internal.AbstractPersistentCollection;
+import org.jadira.usertype.dateandtime.joda.PersistentDateMidnight;
 import somossuinos.aptcomplex.domain.exception.AptComplexInfraException;
 
 /**
@@ -11,39 +16,54 @@ import somossuinos.aptcomplex.domain.exception.AptComplexInfraException;
  */
 public class LazyCollectionNullifier {
 
+    private Set<Collection> verified = new HashSet<>();
+
     @SuppressWarnings("unchecked")
-    public static void execute(final Object obj) {
+    public void execute(final Object obj) {
+        verified.clear();
+
         if (obj instanceof Collection) {
             executeMany((Collection<Object>) obj);
+
         } else {
             executeSingle(obj);
         }
     }
 
-    private static void executeSingle(final Object obj) {
+    @SuppressWarnings("unchecked")
+    private void executeSingle(final Object obj) {
         Class cls = obj.getClass();
 
         for (final Field field : cls.getDeclaredFields()) {
-            if (Collection.class.isAssignableFrom(field.getType())) {
-                try {
+            try {
+                if (Collection.class.isAssignableFrom(field.getType())) {
                     field.setAccessible(true);
                     final Object value = field.get(obj);
 
-                    if (AbstractPersistentCollection.class.isAssignableFrom(value.getClass()) &&
-                            !((AbstractPersistentCollection) value).wasInitialized()) {
-                        field.set(obj, null);
-                    }
+                    if (value != null) {
+                        if (AbstractPersistentCollection.class.isAssignableFrom(value.getClass()) &&
+                                !((AbstractPersistentCollection) value).wasInitialized()) {
+                            field.set(obj, null);
 
-                } catch (IllegalAccessException e) {
-                    throw new AptComplexInfraException(e);
+                        } else {
+                            executeMany((Collection) value);
+                        }
+                    }
                 }
+
+            } catch (IllegalAccessException e) {
+                throw new AptComplexInfraException(e);
             }
         }
     }
 
-    public static void executeMany(final Collection<Object> objs) {
-        for (final Object obj : objs) {
-            executeSingle(obj);
+    public void executeMany(final Collection<Object> objs) {
+        if (!verified.contains(objs)) {
+            verified.add(objs);
+
+            for (final Object obj : objs) {
+                executeSingle(obj);
+            }
         }
     }
 }

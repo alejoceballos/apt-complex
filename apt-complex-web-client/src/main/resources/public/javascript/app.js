@@ -1,13 +1,11 @@
 (function() {
-    var app = angular.module('jk4j-app',
+    var app = angular.module('apt-complex-app',
         [
-            'jk4j-apartment',
-            'jk4j-menu-bar',
+            'apt-complex-apartment',
+            'apt-complex-menu-bar',
             'ngRoute',
             'ui.bootstrap',
             'ui.bootstrap.tpls',
-            'textAngular',
-            'LocalStorageModule',
             'angular-growl',
             'ngAnimate'
         ]);

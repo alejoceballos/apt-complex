@@ -1,8 +1,107 @@
-<div class="app-presentation">
-    <h1><b>Apartments</b></h1>
-    <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec aliquam elit sit amet risus tempus condimentum. Nam id aliquam ligula, non tincidunt erat. Vivamus nec luctus lorem, sed elementum tortor. Cras accumsan ligula magna, sed cursus quam pellentesque tempus. Donec consequat lorem ac mauris pellentesque viverra. Suspendisse ultricies est in libero sagittis, sed lacinia mauris malesuada. Integer accumsan malesuada mattis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
-    </p>
+<div class="page-header">
+    <h1><b>Apartments</b> <small>(monthly)</small></h1>
 </div>
-<div class="row" ng-controller="ApartmentController as apartment">
+<div ng-controller="ApartmentController as aptCtrl">
+    <div class="row">
+        <div class="col-xs-4 col-md-4">
+            <div class="dropdown">
+                <button id="refDateDropDown" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" style="width: 322px">
+                    {{ aptCtrl.data.referenceDate | amDateFormat:'MMMM YYYY' }}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <datetimepicker data-ng-model="aptCtrl.data.referenceDate"
+                                    data-datetimepicker-config="{
+                                    dropdownSelector: '#refDateDropDown',
+                                    startView: 'month',
+                                    minView: 'month' }"
+                                    min-view="month"></datetimepicker>
+                </ul>
+            </div>
+        </div>
+        <div class="col-xs-8 col-md-8">
+            <button class="btn btn-primary btn-lg dropdown-toggle"
+                    ng-if="!aptCtrl.data.apartmentList || aptCtrl.data.apartmentList.length == 0"
+                    ng-click="aptCtrl.generateBillsForMonth()">
+                <span class="glyphicon glyphicon-file"></span>
+                Generate bills for period
+            </button>
+        </div>
+    </div>
+
+    <p>
+
+    <div class="row" ng-if="aptCtrl.data.apartmentList && aptCtrl.data.apartmentList.length > 0">
+        <div class="col-xs-4 col-md-4" ng-repeat="apartmentItem in aptCtrl.data.apartmentList | orderBy:'number'">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-6 col-md-6">
+                            <h3>
+                                <span ng-bind="apartmentItem.number" style="font-weight: bolder"></span>
+                            </h3>
+                        </div>
+                        <div class="col-xs-6 col-md-6" style="text-align: right">
+                            <div>
+                                <span style="font-weight: bold" ng-bind="apartmentItem.totalFee | currency"></span>
+                                <span class="label label-default">
+                                    <span class="glyphicon glyphicon-file"></span>
+                                </span>
+                            </div>
+                            <div>
+                                <span style="font-weight: bold" ng-bind="apartmentItem.totalPayment | currency"></span>
+                                <span class="label label-default">
+                                    <span class="glyphicon glyphicon-usd"></span>
+                                </span>
+                            </div>
+                            <div>
+                                <span class="label label-success" ng-if="apartmentItem.paymentStatus === 'ok'">
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                </span>
+                                <span class="label label-warning" ng-if="apartmentItem.paymentStatus === 'partial'">
+                                    <span class="glyphicon glyphicon-warning-sign"></span>
+                                </span>
+                                <span class="label label-danger" ng-if="apartmentItem.paymentStatus === 'none'">
+                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-file"></span>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" style="padding: 2px">
+                            <li style="padding-top: 2px" class="input-group input-group-sm" ng-repeat="copyItem in apartmentItem.feesItemsCopy.list">
+                                <span class="input-group-addon" id="sizing-addon3">$</span>
+                                <input type="text" class="form-control" placeholder="Value" ng-model="copyItem.value">
+                            </li>
+                            <li style="padding-top: 2px">
+                                <button type="button" class="btn btn-default btn-sm" ng-click="apartmentItem.feesItemsCopy.apply()">
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm" ng-click="apartmentItem.feesItemsCopy.discard()">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </button>
+                            </li>
+                        </ul>
+                        <button type="button" class="btn btn-default">
+                            <span class="glyphicon glyphicon-usd"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="jumbotron" ng-if="aptCtrl.data.apartmentList && aptCtrl.data.apartmentList.length == 0">
+        <div class="container">
+            <h1>Uh oh!</h1>
+            <p>Seems that no bills are registered for this period. No problem... Just create a new set of bills or try another period.</p>
+        </div>
+    </div>
+    <div ng-if="!aptCtrl.data.apartmentList"></div>
+
 </div>

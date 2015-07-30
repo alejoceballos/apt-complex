@@ -8,34 +8,25 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 import somossuinos.aptcomplex.domain.person.document.TaxAndCreditDocument;
 
 /**
  * @since 2015-07-17
  */
 
+@JsonIgnoreProperties( { "new" })
 @Entity
 @Table(name = "person")
-public class Person {
-
-    @Id
-    @GeneratedValue
-    @Column(nullable = false)
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
+public class Person extends AbstractPersistable<Long> {
 
     @Embedded
     private PersonName name = new PersonName();
 
     public PersonName getName() {
         return name;
-    }
-
-    public void setName(@NotNull final PersonName name) {
-        this.name = name;
     }
 
     @Embedded
@@ -56,12 +47,30 @@ public class Person {
     protected Person() {
     }
 
-    public Person(@NotNull final PersonName name) {
-        this.name = name;
-    }
+    public static class Builder {
+        private Person person;
 
-    public Person(final String name) {
-        this.name = new PersonName(name);
-    }
+        private Builder() {
+            this.person = new Person();
+        }
 
+        public static Builder get() {
+            return new Builder();
+        }
+
+        public Person build() {
+            return person;
+        }
+
+        public Builder withName(final String name) {
+            person.name = new PersonName(name);
+            return this;
+        }
+
+        public Builder withDocument(final String document) {
+            person.document = new TaxAndCreditDocument(document);
+            return this;
+        }
+
+    }
 }

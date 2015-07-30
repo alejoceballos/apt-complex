@@ -4,6 +4,7 @@
 # http://docs.vagrantup.com/v2/getting-started/provisioning.html
 # http://howtoforge.www.com/installing-apache2-with-php5-and-mysql-support-on-ubuntu-13.04-lamp
 # https://github.com/varying-vagrant-vagrants/vvv/wiki/Connecting-to-MySQL
+# https://bugs.mysql.com/bug.php?id=77562
 #
 # ------------------------------------------------------------------------------
 # SSH Tunnel
@@ -29,14 +30,24 @@
 # 5) For Password, use "root" or leave it blank so you'll be asked avery time you try to connect
 # 6) For SSH Key Path, leave it blank
 #
-# You may get an error when trying to connect with the last steps configured. If in a different OS than Linux (i.e. Mac), go to "System Profile" tab...
+# You may get an error when trying to connect with the last steps configured.
+#
 # 1) For System type, choose "Linux"
-# 2) For Installation Type, choose "Ubuntu Linux (Vendor Package)"
+# 2) For Installation Type, choose "Ubuntu Linux (MySQL Package)"
 # 3) For Configuration File, enter "/etc/mysql/my.cnf"
 # 4) For Configuration File Section, enter "mysqld"
 # 5) For Start MySQL, enter "start mysql"
 # 6) For Stop MySQL, enter "stop mysql"
 # 7) Check "elevate privileges to..."
+#
+# Some versions of MySQL do not create (or demands) an existing config file in ~/.ssh directory.
+# If facing something similar to an "ERROR SSH connection cancelled" message, do the following:
+#
+# nano ~/.ssh/config
+#
+# Add the following line:
+#
+# StrictHostKeyChecking no
 #
 # ------------------------------------------------------------------------------
 # Access from outside the VM (dev env)

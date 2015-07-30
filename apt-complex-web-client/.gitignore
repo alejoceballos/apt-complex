@@ -1,11 +1,8 @@
 bower_components/
 node_modules/
 src/main/resources/public/fonts/
-src/main/resources/public/stylesheets/angular-growl.css
-src/main/resources/public/stylesheets/bootstrap.css
 src/main/resources/public/stylesheets/bootstrap.css.map
-src/main/resources/public/stylesheets/codemirror.css
-src/main/resources/public/stylesheets/font-awesome.css
-src/main/resources/public/stylesheets/textAngular.css
+src/main/resources/public/stylesheets/bootstrap-theme.css.map
+src/main/resources/public/stylesheets/vendor.css
 npm-debug.log
 src/main/resources/public/javascript/vendor.js

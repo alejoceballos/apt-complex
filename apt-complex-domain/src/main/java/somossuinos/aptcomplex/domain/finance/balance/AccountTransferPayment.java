@@ -1,4 +1,4 @@
-package somossuinos.aptcomplex.domain.finance.payment;
+package somossuinos.aptcomplex.domain.finance.balance;
 
 import somossuinos.aptcomplex.domain.finance.bank.Account;
 

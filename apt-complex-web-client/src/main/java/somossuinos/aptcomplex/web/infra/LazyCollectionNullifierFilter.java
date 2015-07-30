@@ -18,7 +18,8 @@ public class LazyCollectionNullifierFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext containerRequestContext, ContainerResponseContext containerResponseContext) throws IOException {
         if (containerResponseContext.getEntity() instanceof ApiResult) {
-            LazyCollectionNullifier.execute(((ApiResult) containerResponseContext.getEntity()).getData());
+            final LazyCollectionNullifier nullifier = new LazyCollectionNullifier();
+            nullifier.execute(((ApiResult) containerResponseContext.getEntity()).getData());
         }
     }
 }

@@ -32,31 +32,6 @@ MAIN CONTAINERS
     min-width: 250px;
     margin-left: auto;
     margin-right: auto;
-    padding: 60px 20px 0 20px;
+    padding: 30px 20px 10px 20px;
     min-height: 100%;
-}
-
-/*
-= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-ABOUT PAGE CONTAINER
-= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-*/
-div.app-presentation {
-    color: black;
-    text-decoration: solid;
-}
-
-div.app-presentation > p {
-    font-size: 16px;
-    font-weight: normal;
-}
-
-div.app-presentation > h1 {
-    font-size: 40px;
-    font-weight: 900;
-}
-
-div.app-presentation > h2 {
-    font-size: 30px;
-    font-weight: 500;
 }

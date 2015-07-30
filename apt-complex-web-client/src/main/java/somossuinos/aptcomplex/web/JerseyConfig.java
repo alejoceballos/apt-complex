@@ -1,10 +1,11 @@
 package somossuinos.aptcomplex.web;
 
-import javax.ws.rs.ApplicationPath;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;
 import somossuinos.aptcomplex.web.apartment.ApartmentApiEntryPoint;
 import somossuinos.aptcomplex.web.infra.LazyCollectionNullifierFilter;
+
+import javax.ws.rs.ApplicationPath;
 
 /**
  * @author ceballos

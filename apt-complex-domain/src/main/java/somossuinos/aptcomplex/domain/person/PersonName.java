@@ -1,5 +1,6 @@
 package somossuinos.aptcomplex.domain.person;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -10,15 +11,15 @@ import org.apache.commons.lang3.StringUtils;
  * @since 2015-07-17
  */
 @Embeddable
-public class PersonName {
+public class PersonName implements Serializable {
 
-    @Column(length = 50)
+    @Column(name = "first_name", length = 50)
     private String firstName;
 
-    @Column(length = 255)
+    @Column(name = "middle_name", length = 255)
     private String middleName;
 
-    @Column(length = 50)
+    @Column(name = "last_name", length = 50)
     private String lastName;
 
     protected PersonName() {
