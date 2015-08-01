@@ -26,5 +26,20 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long> {
             "left outer join fetch f.payments p " +
             "where f.referenceDate between :iniDate and :endDate "
     )
-    List<Apartment> findByFeePeriod(@Param("iniDate") final DateTime iniDate, @Param("endDate") final DateTime endDate);
+    List<Apartment> findByFeePeriod(
+            @Param("iniDate") final DateTime iniDate,
+            @Param("endDate") final DateTime endDate);
+
+    @Query("select distinct a " +
+            "from Apartment a " +
+            "left outer join fetch a.fees f " +
+            "left outer join fetch f.items i " +
+            "where a.id = :id " +
+            "and f.referenceDate between :iniDate and :endDate "
+
+    )
+    Apartment findOneByReferenceMonth(
+            @Param("id") final Long id,
+            @Param("iniDate") final DateTime iniDate,
+            @Param("endDate") final DateTime endDate);
 }

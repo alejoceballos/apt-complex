@@ -10,4 +10,7 @@ public class AptComplexDomainException extends AptComplexException {
         super(message);
     }
 
+    public AptComplexDomainException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -3,13 +3,14 @@
         [
             'ui.bootstrap',
             'ui.bootstrap.datetimepicker',
-            'angularMoment'
+            'angularMoment',
+            'angular-growl'
         ]);
-
 
     app.service('remoteApiService', [
         '$http',
-        function($http) {
+        'growl',
+        function($http, growl) {
             var url = "api/apartment/";
 
             this.getByReferenceMonth = function(year, month) {
@@ -18,30 +19,68 @@
                     url: url + "year/" + year + "/month/" + month
                 };
 
+                growl.info("Retrieving fees");
+
                 return $http(options).then(
                     function(response) {
+                        growl.success("Fees retrieved");
                         return response.data;
                     }
                 ).catch(
                     function(err) {
+                        growl.error("Error retrieving fees");
                         console.log(err);
                         throw err;
                     }
                 );
             };
 
-            this.generateBillsForMonth = function(year, month) {
+            this.generateFeesForMonth = function(year, month) {
                 var options = {
                     method: 'POST',
-                    url: url + "genbill/year/" + year + "/month/" + month
+                    url: url + "generate-bill/year/" + year + "/month/" + month
                 };
+
+                growl.info("Generating fees");
 
                 return $http(options).then(
                     function(response) {
+                        growl.success("Fees generated");
                         return response.data;
                     }
                 ).catch(
                     function(err) {
+                        growl.error("Error generating fees");
+                        console.log(err);
+                        throw err;
+                    }
+                );
+            };
+
+            this.updateFeeForMonth = function(id, year, month, newItems, removedItems, updatedItems) {
+                var options = {
+                    method: 'POST',
+                    url: url + "update-bill/id/" + id + "/year/" + year + "/month/" + month,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: {
+                        newItems: newItems,
+                        removedItems: removedItems,
+                        updatedItems: updatedItems
+                    }
+                };
+
+                growl.info("Updating fee");
+
+                return $http(options).then(
+                    function(response) {
+                        growl.success("Fee updated");
+                        return response.data;
+                    }
+                ).catch(
+                    function(err) {
+                        growl.error("Error updating fee");
                         console.log(err);
                         throw err;
                     }
@@ -50,8 +89,49 @@
         }
     ]);
 
+    app.value('BillItemStatus', {
+        NEW: "new",
+        COPIED: "copied"
+    });
+
+    app.factory('BillItemFactory', function() {
+        var BillItemFactory = function(billItem) {
+            if (!billItem) {
+                var _billItem = {
+                    id: null,
+                    type: "CUSTOM",
+                    description: "Created by GUI",
+                    value: 0
+                };
+
+            } else {
+                var _billItem = {
+                    id: billItem.id,
+                    type: billItem.type,
+                    description: billItem.description,
+                    value: billItem.value
+                };
+            }
+
+            this.withValue = function(value) {
+                _billItem.value = value;
+                return this;
+            };
+
+            this.create = function() {
+                return _billItem;
+            };
+        };
+
+        return BillItemFactory;
+    });
+
     app.service('billService', function() {
         this.build = function(bill) {
+            if (!(bill.referenceDate instanceof Date)) {
+                bill.referenceDate = new Date(bill.referenceDate);
+            }
+
             bill.hasItems = function() {
                 return !!this.items && this.items.length > 0;
             };
@@ -89,25 +169,32 @@
     });
 
     app.service('apartmentService', [
+        'BillItemStatus',
         'billService',
-        function(billService) {
+        'BillItemFactory',
+        'remoteApiService',
+        function(BillItemStatus, billService, BillItemFactory, remoteApiService) {
+            var that = this;
+
             this.build = function(apartment) {
+                // If possible, convert to number so it can be ordered
                 if (!isNaN(parseInt(apartment.number))) {
                     apartment.number = parseInt(apartment.number);
                 }
 
+                // Summary function
                 function calculateHasFee() {
                     return !!apartment.fees && apartment.fees.length > 0;
                 }
 
-                apartment.hasFee = calculateHasFee();
-
+                // Summary function
                 if (calculateHasFee()) {
                     for (var feeIdx in apartment.fees) {
                         billService.build(apartment.fees[feeIdx]);
                     }
                 }
 
+                // Summary function
                 function calculateTotalFee() {
                     var total = 0;
 
@@ -120,8 +207,7 @@
                     return total;
                 }
 
-                apartment.totalFee = calculateTotalFee();
-
+                // Summary function
                 function calculateTotalPayment() {
                     var total = 0;
 
@@ -134,8 +220,7 @@
                     return total;
                 }
 
-                apartment.totalPayment = calculateTotalPayment();
-
+                // Summary function
                 function calculatePaymentStatus() {
                     var tFee = calculateTotalFee();
                     var tPymnt = calculateTotalPayment();
@@ -144,8 +229,7 @@
                     return diff >= 0 ? "ok" : (tPymnt > 0 ? "partial" : "none");
                 }
 
-                apartment.paymentStatus = calculatePaymentStatus();
-
+                // Summary function
                 function calculateHasPayment() {
                     if (calculateHasFee()) {
                         for (var feeIdx in apartment.fees) {
@@ -158,51 +242,103 @@
                     return false;
                 }
 
-                apartment.hasPayment = calculateHasPayment();
+                function summarize() {
+                    apartment.hasFee = calculateHasFee();
+                    apartment.totalFee = calculateTotalFee();
+                    apartment.totalPayment = calculateTotalPayment();
+                    apartment.paymentStatus = calculatePaymentStatus();
+                    apartment.hasPayment = calculateHasPayment();
+                }
 
-                apartment.feesItemsCopy = {
+                apartment.feesItems = {
                     list: [],
+                    removed: [],
+
                     make: function () {
-                        apartment.feesItemsCopy.list = [];
+                        apartment.feesItems.list = [];
+                        apartment.feesItems.removed = [];
 
                         if (calculateHasFee()) {
                             for (var feeIdx in apartment.fees) {
-                                if (apartment.fees[feeIdx].hasItems()) {
-                                    for (var itemIdx in apartment.fees[feeIdx].items) {
-                                        apartment.feesItemsCopy.list.push(
-                                            {
-                                                value: apartment.fees[feeIdx].items[itemIdx].value,
-                                                originalItem: apartment.fees[feeIdx].items[itemIdx]
-                                            }
-                                        );
+                                var fee = apartment.fees[feeIdx];
+
+                                if (fee.hasItems()) {
+                                    for (var itemIdx in fee.items) {
+                                        var feeItem = fee.items[itemIdx];
+                                        var copy = new BillItemFactory(feeItem).create();
+                                        copy.status = BillItemStatus.COPIED;
+                                        apartment.feesItems.list.push(copy);
                                     }
                                 }
                             }
                         }
                     },
 
+                    add: function() {
+                        var feeItem = new BillItemFactory().create();
+                        feeItem.status = BillItemStatus.NEW;
+                        apartment.feesItems.list.push(feeItem);
+                    },
+
+                    remove: function(feeItem) {
+                        var feeItemIdx = apartment.feesItems.list.indexOf(feeItem);
+
+                        if (feeItemIdx > -1) {
+                            apartment.feesItems.removed.push(feeItem.id);
+                            apartment.feesItems.list.splice(feeItemIdx, 1);
+                        }
+                    },
+
                     apply: function () {
-                        for (var copyIdx in apartment.feesItemsCopy.list) {
-                            var copyItem = apartment.feesItemsCopy.list[copyIdx];
-                            copyItem.originalItem.value = copyItem.value;
+                        var newItems = [];
+                        var updatedItems = [];
+                        var removedItems = apartment.feesItems.removed;
+
+                        for (var copyIdx in apartment.feesItems.list) {
+                            var copy = apartment.feesItems.list[copyIdx];
+
+                            if (copy.status === BillItemStatus.NEW) {
+                                newItems.push(new BillItemFactory(copy).create());
+
+                            } else {
+                                updatedItems.push(new BillItemFactory(copy).create());
+                            }
                         }
 
-                        apartment.hasFee = calculateHasFee();
-                        apartment.totalFee = calculateTotalFee();
-                        apartment.totalPayment = calculateTotalPayment();
-                        apartment.paymentStatus = calculatePaymentStatus();
-                        apartment.hasPayment = calculateHasPayment();
+                        // get THIS apartment fro THIS year and month
+                        remoteApiService.updateFeeForMonth(
+                            apartment.id,
+                            apartment.fees[0].referenceDate.getFullYear(),
+                            apartment.fees[0].referenceDate.getMonth() + 1,
+                            newItems,
+                            removedItems,
+                            updatedItems
+                        ).then(
+                            function(result) {
+                                apartment.id = result.data.id;
+                                apartment.number = result.data.number;
+                                apartment.residents = result.data.residents;
+                                apartment.fees = result.data.fees;
+
+                                that.build(apartment);
+                                summarize();
+                                apartment.feesItems.make();
+                            }
+                        ).catch(
+                            function(err) {
+                                console.log("-- ApartmentController: " + err);
+                            }
+                        );
                     },
 
                     discard: function () {
-                        for (var copyIdx in apartment.feesItemsCopy.list) {
-                            var copyItem = apartment.feesItemsCopy.list[copyIdx];
-                            copyItem.value = copyItem.originalItem.value;
-                        }
+                        apartment.feesItems.make();
                     }
+
                 };
 
-                apartment.feesItemsCopy.make();
+                summarize();
+                apartment.feesItems.make();
             };
 
             this.buildList = function(list) {
@@ -251,8 +387,8 @@
                 }
             );
 
-            this.generateBillsForMonth = function() {
-                remoteApiService.generateBillsForMonth(
+            this.generateFeesForMonth = function() {
+                remoteApiService.generateFeesForMonth(
                         controllerData.referenceDate.getFullYear(),
                         controllerData.referenceDate.getMonth() + 1
                 ).then(

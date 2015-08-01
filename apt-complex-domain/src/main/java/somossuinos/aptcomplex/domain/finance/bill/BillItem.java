@@ -5,8 +5,12 @@ import javax.validation.constraints.NotNull;
 
 import org.joda.money.Money;
 import org.springframework.data.jpa.domain.AbstractPersistable;
+import somossuinos.aptcomplex.domain.exception.AptComplexDomainException;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author ceballos
@@ -50,6 +54,7 @@ public class BillItem extends AbstractPersistable<Long> {
 
     public static class Builder {
         private BillItem item;
+        private Map<String, Object> attributes = new HashMap<>();
 
         private Builder() {
             item = new BillItem();
@@ -59,23 +64,42 @@ public class BillItem extends AbstractPersistable<Long> {
             return new Builder();
         }
 
+        public static Builder get(final BillItem item) {
+            final Builder builder = new Builder();
+            builder.item = item;
+
+            return builder;
+        }
+
         public BillItem build() {
+            for (final Map.Entry<String, Object> entry : attributes.entrySet()) {
+                try {
+                    final Field field = BillItem.class.getDeclaredField(entry.getKey());
+                    field.setAccessible(true);
+                    field.set(item, entry.getValue());
+
+                } catch (final ReflectiveOperationException e) {
+                    throw new AptComplexDomainException(e);
+                }
+            }
+
             return item;
         }
 
         public Builder withType(final BillItemType type) {
-            item.type = type;
+            attributes.put("type", type);
             return this;
         }
 
         public Builder withDescription(final String description) {
-            item.description = description;
+            attributes.put("description", description);
             return this;
         }
 
         public Builder withValue(final BigDecimal value) {
-            item.value = value;
+            attributes.put("value", value);
             return this;
         }
     }
+
 }

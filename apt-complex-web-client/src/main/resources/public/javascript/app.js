@@ -1,4 +1,6 @@
 (function() {
+    'use strict';
+
     var app = angular.module('apt-complex-app',
         [
             'apt-complex-apartment',
@@ -23,5 +25,13 @@
             otherwise({
                 redirectTo: '/about'
             });
-    }])
+    }]);
+
+    app.config(['growlProvider',
+        function(growlProvider) {
+            growlProvider.globalDisableCountDown(true);
+            growlProvider.globalTimeToLive(5000);
+        }
+    ]);
+
 })();
