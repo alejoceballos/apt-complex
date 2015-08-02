@@ -10,20 +10,20 @@ import somossuinos.aptcomplex.domain.TestConfig;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = TestConfig.class)
 public class ApartmentTest {
-
-    @PersistenceContext
-    private EntityManager em;
 
     @Before
     public void before() {
     }
 
     @Test
-    public void testSave() {
-        Apartment.Builder.get().withNumber("800");
+    public void testInstantiate() {
+        // Collections must be empty, but not null
+    }
+
+    @Test
+    public void testBuilder() {
+        // Must set all attributes collective and independent
     }
 
 }

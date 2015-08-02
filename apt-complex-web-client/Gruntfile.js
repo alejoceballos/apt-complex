@@ -27,6 +27,7 @@ module.exports = function(grunt) { 'use strict';
                     './bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
                     './bower_components/angular-dragdrop/src/angular-dragdrop.js',
                     './bower_components/ng-flow/src/angular-flow.js',
+                    './bower_components/angular-resource/angular-resource.js',
 
                     './bower_components/angular-animate/angular-animate.js',
                     './bower_components/angular-growl-v2/angular-growl.js',
@@ -35,34 +36,15 @@ module.exports = function(grunt) { 'use strict';
                     './bower_components/angular-moment/angular-moment.js',
 
                     './bower_components/angular-bootstrap-datetimepicker/datetimepicker.js'
-
-
-                    //'./bower_components/rangy/rangy-core.js',
-                    //'./bower_components/rangy/rangy-selectionsaverestore.js',
-                    //'./bower_components/textAngular/textAngular.js',
-                    //'./bower_components/textAngular/textAngular-sanitize.js',
-                    //'./bower_components/textAngular/textAngularSetup.js',
-
-                    //'./bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js',
-
-                    //'./bower_components/angular-local-storage/angular-local-storage.js',
-
-                    //'./bower_components/codemirror/codemirror.js',
-                    //'./bower_components/angular-ui-codemirror/ui-codemirror.js',
                 ],
                 dest: './src/main/resources/public/javascript/vendor.js'
             },
             vendorCss: {
                 src: [
                     './bower_components/bootstrap/dist/css/bootstrap.css',
-                    //'./bower_components/bootstrap/dist/css/bootstrap-theme.css',
-                    //'./bower_components/textAngular/textAngular.css',
                     './bower_components/font-awesome/font-awesome.css',
                     './bower_components/angular-growl-v2/angular-growl.css',
                     './bower_components/angular-bootstrap-datetimepicker/datetimepicker.css'
-                    //'./bower_components/codemirror/lib/codemirror.css',
-                    //'./bower_components/angular-datepicker/dist/index.css',
-                    //'./bower_components/angular-datepicker/app/styles/bootstrap.css'
                 ],
                 dest: './src/main/resources/public/stylesheets/vendor.css'
             }

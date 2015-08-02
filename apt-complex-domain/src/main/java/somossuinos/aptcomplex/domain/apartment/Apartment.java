@@ -2,11 +2,14 @@ package somossuinos.aptcomplex.domain.apartment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.jpa.domain.AbstractPersistable;
+import somossuinos.aptcomplex.domain.finance.balance.Payment;
 import somossuinos.aptcomplex.domain.finance.bill.Bill;
+import somossuinos.aptcomplex.domain.finance.bill.BillItem;
 import somossuinos.aptcomplex.domain.person.Person;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -64,6 +67,39 @@ public class Apartment extends AbstractPersistable<Long> {
     private Long version;
 
     protected Apartment() {
+    }
+
+    public BigDecimal totalFee(final int year, final int month) {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (final Bill fee : fees) {
+            if (fee.getReferenceDate().getYear() == year && fee.getReferenceDate().getMonthOfYear() == month) {
+                total = total.add(fee.totalFee());
+            }
+        }
+
+        return total;
+    }
+
+    public BigDecimal totalPayment(final int year, final int month) {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (final Bill fee : fees) {
+            if (fee.getReferenceDate().getYear() == year && fee.getReferenceDate().getMonthOfYear() == month) {
+                total = total.add(fee.totalPayment());
+            }
+        }
+
+        return total;
+    }
+
+    public void addPayment(final Payment payment, final int year, final int month) {
+        for (final Bill fee : fees) {
+            if (fee.getReferenceDate().getYear() == year && fee.getReferenceDate().getMonthOfYear() == month) {
+                fee.getPayments().add(payment);
+                return;
+            }
+        }
     }
 
     public static class Builder {

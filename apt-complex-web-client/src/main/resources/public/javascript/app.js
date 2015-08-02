@@ -9,29 +9,40 @@
             'ui.bootstrap',
             'ui.bootstrap.tpls',
             'angular-growl',
-            'ngAnimate'
+            'ngAnimate',
+            'ngResource'
         ]);
 
-    app.config(['$routeProvider', function($routeProvider) {
-        'use strict';
+    app.config(
+        [
+            '$routeProvider',
+            function($routeProvider) {
+                'use strict';
 
-        $routeProvider.
-            when('/about', {
-                templateUrl: '/javascript/about/about.tpl.html'
-            }).
-            when('/apartment', {
-                templateUrl: '/javascript/apartment/apartment.tpl.html'
-            }).
-            otherwise({
-                redirectTo: '/about'
-            });
-    }]);
+                $routeProvider.
+                    when('/about', {
+                        templateUrl: '/javascript/about/about.tpl.html'
+                    }).
+                    when('/apartment', {
+                        templateUrl: '/javascript/apartment/apartment.tpl.html'
+                    }).
+                    otherwise({
+                        redirectTo: '/about'
+                    });
+            }
+        ]
+    );
 
-    app.config(['growlProvider',
-        function(growlProvider) {
-            growlProvider.globalDisableCountDown(true);
-            growlProvider.globalTimeToLive(5000);
-        }
-    ]);
+    app.config(
+        [
+            'growlProvider',
+            function(growlProvider) {
+                growlProvider.globalDisableCountDown(true);
+                growlProvider.onlyUniqueMessages(false);
+                growlProvider.globalReversedOrder(false);
+                growlProvider.globalTimeToLive(3000);
+            }
+        ]
+    );
 
 })();

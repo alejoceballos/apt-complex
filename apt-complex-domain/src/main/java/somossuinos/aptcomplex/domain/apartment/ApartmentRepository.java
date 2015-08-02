@@ -13,19 +13,12 @@ import org.springframework.data.repository.query.Param;
  */
 public interface ApartmentRepository extends JpaRepository<Apartment, Long> {
 
-    @Query("from Apartment a " +
-            "left outer join fetch a.residents " +
-            "left outer join fetch a.fees"
-    )
-    List<Apartment> findAllEager();
-
     @Query("select distinct a " +
             "from Apartment a " +
             "left outer join fetch a.fees f " +
             "left outer join fetch f.items i " +
             "left outer join fetch f.payments p " +
-            "where f.referenceDate between :iniDate and :endDate "
-    )
+            "where f.referenceDate between :iniDate and :endDate ")
     List<Apartment> findByFeePeriod(
             @Param("iniDate") final DateTime iniDate,
             @Param("endDate") final DateTime endDate);
@@ -34,11 +27,10 @@ public interface ApartmentRepository extends JpaRepository<Apartment, Long> {
             "from Apartment a " +
             "left outer join fetch a.fees f " +
             "left outer join fetch f.items i " +
+            "left outer join fetch f.payments p " +
             "where a.id = :id " +
-            "and f.referenceDate between :iniDate and :endDate "
-
-    )
-    Apartment findOneByReferenceMonth(
+            "and f.referenceDate between :iniDate and :endDate ")
+    Apartment findOneByFeePeriod(
             @Param("id") final Long id,
             @Param("iniDate") final DateTime iniDate,
             @Param("endDate") final DateTime endDate);

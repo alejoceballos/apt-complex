@@ -1,15 +1,15 @@
 package somossuinos.aptcomplex.domain.apartment;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
+import somossuinos.aptcomplex.domain.finance.balance.Payment;
+import somossuinos.aptcomplex.domain.finance.balance.TransactionType;
 import somossuinos.aptcomplex.domain.finance.bill.Bill;
 import somossuinos.aptcomplex.domain.finance.bill.BillItem;
 import somossuinos.aptcomplex.domain.finance.bill.BillItemType;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.transaction.Transactional;
@@ -33,7 +33,7 @@ public class ApartmentService {
     }
 
     @Transactional
-    public List<Apartment> generateFeesForReferenceMonth(final int year, final int month) {
+    public void generateFeesForReferenceMonth(final int year, final int month) {
         final BigDecimal feeValue = BigDecimal.valueOf(800);
         final BigDecimal surchargeValue = BigDecimal.valueOf(250);
         final BigDecimal discountValue = BigDecimal.valueOf(-50);
@@ -63,10 +63,6 @@ public class ApartmentService {
                             .build());
         }
 
-        final DateTime iniDate = new DateTime(year, month, 1, 0, 0);
-        final DateTime endDate = new DateTime(year, month, iniDate.toGregorianCalendar().getActualMaximum(Calendar.DAY_OF_MONTH), 0, 0);
-
-        return repository.findByFeePeriod(iniDate, endDate);
     }
 
     @Transactional
@@ -74,11 +70,11 @@ public class ApartmentService {
             final Long id,
             final int year,
             final int month,
-            final ApartmentOperationDto dto) {
+            final ApartmentOperationDto<BillItem> dto) {
 
         final DateTime iniDate = new DateTime(year, month, 1, 0, 0);
         final DateTime endDate = new DateTime(year, month, iniDate.toGregorianCalendar().getActualMaximum(Calendar.DAY_OF_MONTH), 0, 0);
-        final Apartment apartment = repository.findOneByReferenceMonth(id, iniDate, endDate);
+        final Apartment apartment = repository.findOneByFeePeriod(id, iniDate, endDate);
 
         Bill mainFee = null;
 
@@ -127,6 +123,93 @@ public class ApartmentService {
         }
 
         return apartment;
+    }
+
+    @Transactional
+    public Apartment updatePaymentsForReferenceMonth(
+            final Long id,
+            final int year,
+            final int month,
+            final ApartmentOperationDto<Payment> dto) {
+
+        final DateTime iniDate = new DateTime(year, month, 1, 0, 0);
+        final DateTime endDate = new DateTime(year, month, iniDate.toGregorianCalendar().getActualMaximum(Calendar.DAY_OF_MONTH), 0, 0);
+        final Apartment apartment = repository.findOneByFeePeriod(id, iniDate, endDate);
+
+        Bill mainFee = null;
+
+        for (final Bill fee : apartment.getFees()) {
+            final Set<Payment> itemsToRemove = new HashSet<>();
+
+            for (Payment item : fee.getPayments()) {
+                boolean found = false;
+
+                for (final Long removed : dto.getRemovedItems()) {
+                    if (removed.equals(item.getId())) {
+                        itemsToRemove.add(item);
+                        dto.getRemovedItems().remove(removed);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    // Update
+                    for (final Payment updated : dto.getUpdatedItems()) {
+                        if (item.getId().equals(updated.getId())) {
+                            Payment.Builder.get(item)
+                                    .withValue(updated.getValue())
+                                    .withType(updated.getType())
+                                    .withWhen(updated.getWhen())
+                                    .withNote(updated.getNote())
+                                    .build();
+                            dto.getUpdatedItems().remove(updated);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Remove
+            if (itemsToRemove.size() > 0) {
+                fee.getPayments().removeAll(itemsToRemove);
+            }
+
+            mainFee = fee;
+        }
+
+        // Add
+        for (final Payment newItem : dto.getNewItems()) {
+            mainFee.getPayments().add(newItem);
+        }
+
+        return apartment;
+    }
+
+    @Transactional
+    public void generatePaymentsForReferenceMonth(final int year, final int month) {
+        final DateTime iniDate = new DateTime(year, month, 1, 0, 0);
+        final DateTime endDate = new DateTime(year, month, iniDate.toGregorianCalendar().getActualMaximum(Calendar.DAY_OF_MONTH), 0, 0);
+
+        final List<Apartment> apartments = repository.findByFeePeriod(iniDate, endDate);
+
+        for (final Apartment apartment : apartments) {
+            if (!CollectionUtils.isEmpty(apartment.getFees())) {
+                final BigDecimal totalFee = apartment.totalFee(year, month);
+                final BigDecimal totalPayment = apartment.totalPayment(year, month);
+
+                if (totalFee.doubleValue() > totalPayment.doubleValue()) {
+                    final Payment payment = Payment.Builder.get()
+                            .withValue(totalFee.subtract(totalPayment))
+                            .withNote("AUTOMATICALLY GENERATED FOR PERIOD (DIFF FROM TOTAL)")
+                            .withType(TransactionType.INCOME)
+                            .withWhen(DateTime.now())
+                            .build();
+
+                    apartment.addPayment(payment, year, month);
+                }
+            }
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package somossuinos.aptcomplex.domain.finance.bill;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
@@ -61,8 +62,24 @@ public class Bill extends AbstractPersistable<Long> {
     protected Bill() {
     }
 
-    public Money totalPaid() {
-        return null;
+    public BigDecimal totalFee() {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (final BillItem item : items) {
+            total = total.add(item.getValue());
+        }
+
+        return total;
+    }
+
+    public BigDecimal totalPayment() {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (final Payment payment: payments) {
+            total = total.add(payment.getValue());
+        }
+
+        return total;
     }
 
     public static class Builder {

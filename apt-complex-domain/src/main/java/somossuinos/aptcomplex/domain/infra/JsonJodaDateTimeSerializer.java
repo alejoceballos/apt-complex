@@ -1,7 +1,6 @@
 package somossuinos.aptcomplex.domain.infra;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.joda.time.DateTime;
@@ -24,13 +23,13 @@ import java.io.IOException;
  */
 public class JsonJodaDateTimeSerializer extends JsonSerializer<DateTime> {
 
-    private static DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
+    private static final DateTimeFormatter FORMATTER = ISODateTimeFormat.dateTime();
 
     @Override
     public void serialize(final DateTime value, final JsonGenerator gen, final SerializerProvider provider)
             throws IOException {
 
-        gen.writeString(formatter.print(value));
+        gen.writeString(FORMATTER.print(value));
     }
 
 }
