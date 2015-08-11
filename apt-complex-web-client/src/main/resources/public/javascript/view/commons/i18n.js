@@ -40,8 +40,10 @@
                     MENU_PORTUGUESE: 'Portuguese (BR)',
 
                     SUMMARY_TITLE: "Summary",
-                    SUMMARY_INCOMES: "Incomes",
-                    SUMMARY_EXPENSES: 'Expenses',
+                    SUMMARY_TITLE_INCOMES: "Incomes",
+                    SUMMARY_TITLE_EXPENSES: 'Expenses',
+                    SUMMARY_TOTAL_FEE: "Total cond. fee",
+                    SUMMARY_TOTAL_PAYMENT: "Total payment",
 
                     ABOUT_TITLE: 'Welcome...',
                     ABOUT_SUBTITLE: '... To <b>Apartment Complex</b> Manager',
@@ -71,8 +73,10 @@
                     MENU_PORTUGUESE: 'Português (BR)',
 
                     SUMMARY_TITLE: "Resumo",
-                    SUMMARY_INCOMES: "Créditos",
-                    SUMMARY_EXPENSES: 'Gastos',
+                    SUMMARY_TITLE_INCOMES: "Créditos",
+                    SUMMARY_TITLE_EXPENSES: 'Gastos',
+                    SUMMARY_TOTAL_FEE: "Taxa cond. total",
+                    SUMMARY_TOTAL_PAYMENT: "Pagamento total",
 
                     ABOUT_TITLE: 'Bem vindo...',
                     ABOUT_SUBTITLE: '... Ao gerenciador de <b>Condomínio</b>',

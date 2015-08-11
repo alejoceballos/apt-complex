@@ -6,6 +6,7 @@
             'app-i18n',
             'app-remote-api',
             'app-view-menu-bar',
+            'app-domain',
             'app-summary',
             'ngRoute',
             'ui.bootstrap',

@@ -6,11 +6,10 @@
             "$scope",
             "$rootScope",
             "remoteApiService",
-            function($scope, $rootScope, remoteApiService) {
+            "domainService",
+            function($scope, $rootScope, remoteApiService, domainService) {
                 console.log(">> SummaryController");
-                var that = this;
-
-                that.data = controllerData;
+                this.data = controllerData;
 
                 function updateView(aDate) {
                     remoteApiService.balance.summary(
@@ -18,8 +17,17 @@
                         aDate.getMonth() + 1
                     ).then(
                         function(result) {
-                            controllerData.balance = result.data;
-                            that.data.balance = controllerData.balance;
+                            if (result.data && result.data != null) {
+                                controllerData.balance = domainService.MonthlyBalance.build(result.data);
+                                controllerData.totals = controllerData.balance.getIncomeTotals();
+
+                            } else {
+                                controllerData.balance = null;
+                                controllerData.totals = {
+                                    fee: 0,
+                                    payment: 0
+                                };
+                            }
                         }
                     ).catch(
                         function(err) {
@@ -42,13 +50,16 @@
                 );
 
                 updateView($rootScope.data.referenceDate);
-
             }
         ]
     );
 
     var controllerData = {
-        balance: null
+        balance: null,
+        totals: {
+            payment: 0,
+            fee: 0
+        }
     };
 
 })();

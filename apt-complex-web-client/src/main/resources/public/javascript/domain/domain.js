@@ -10,12 +10,43 @@
         NO_WHEN_FOUND: "No \"when\" found in object",
         NO_NOTE_FOUND: "No \"note\" found in object",
         NO_NUMBER_FOUND: "No \"number\" found in object",
-        NO_APARTMENT_FOUND: "No \"apartment\" found in object"
+        NO_APARTMENT_FOUND: "No \"apartment\" found in object",
+        NO_REF_DATE_FOUND: "No \"reference date\" found in object",
+        NO_BALANCE_GROUPS_FOUND: "No \"balance groups\" found in object"
     };
 
     app.service("domainService",
         [
             function() {
+                function build(Class, obj, asMap) {
+                    var result;
+
+                    if (obj) {
+                        if (obj instanceof Array) {
+                            result = new Array();
+
+                            for (var idx in obj) {
+                                result.push(new Class(obj[idx]));
+                            }
+
+                        } else if (asMap) {
+                            result = {};
+
+                            for (var idx in obj) {
+                                result[idx] = new Class(obj[idx]);
+                            }
+
+                        } else {
+                            result = new Class(obj);
+                        }
+
+                    } else {
+                        result = new Class();
+                    }
+
+                    return result;
+                }
+
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
                 // BILL ITEM
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -30,40 +61,22 @@
                         this.value = 0;
 
                     } else {
-                        if (!obj.id) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
                         this.id = obj.id;
 
-                        if (!obj.type) throw DOMAIN_OBJ + ": " + ERROR.NO_TYPE_FOUND;
+                        if (obj.type === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_TYPE_FOUND;
                         this.type = obj.type;
 
-                        if (!obj.description) throw DOMAIN_OBJ + ": " + ERROR.NO_DESC_FOUND;
+                        if (obj.description === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_DESC_FOUND;
                         this.description = obj.description;
 
-                        if (!obj.value) throw DOMAIN_OBJ + ": " + ERROR.NO_VALUE_FOUND;
+                        if (obj.value === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_VALUE_FOUND;
                         this.value = obj.value;
                     }
                 };
 
                 BillItem.build = function(obj) {
-                    var result;
-
-                    if (obj) {
-                        if (obj instanceof Array) {
-                            result = new Array();
-
-                            for (var idx in obj) {
-                                result.push(new BillItem(obj[idx]));
-                            }
-
-                        } else {
-                            result = new BillItem(obj);
-                        }
-
-                    } else {
-                        result = new BillItem();
-                    }
-
-                    return result;
+                    return build(BillItem, obj, false);
                 };
 
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -81,43 +94,25 @@
                         this.note = "Created by GUI";
 
                     } else {
-                        if (!obj.id) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
                         this.id = obj.id;
 
-                        if (!obj.type) throw DOMAIN_OBJ + ": " + ERROR.NO_VALUE_FOUND;
+                        if (obj.value === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_VALUE_FOUND;
                         this.value = obj.value;
 
-                        if (!obj.type) throw DOMAIN_OBJ + ": " + ERROR.NO_TYPE_FOUND;
+                        if (obj.type === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_TYPE_FOUND;
                         this.type = obj.type;
 
-                        if (!obj.type) throw DOMAIN_OBJ + ": " + ERROR.NO_WHEN_FOUND;
+                        if (obj.when === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_WHEN_FOUND;
                         this.when = obj.when;
 
-                        if (!obj.type) throw DOMAIN_OBJ + ": " + ERROR.NO_NOTE_FOUND;
+                        if (obj.note === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_NOTE_FOUND;
                         this.note = obj.note;
                     }
                 };
 
                 Payment.build = function(obj) {
-                    var result;
-
-                    if (obj) {
-                        if (obj instanceof Array) {
-                            result = new Array();
-
-                            for (var idx in obj) {
-                                result.push(new Payment(obj[idx]));
-                            }
-
-                        } else {
-                            result = new Payment(obj);
-                        }
-
-                    } else {
-                        result = new Payment();
-                    }
-
-                    return result;
+                    return build(Payment, obj, false);
                 };
 
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -133,7 +128,7 @@
                         this.payments = [];
 
                     } else {
-                        if (!obj.id) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
                         this.id = obj.id;
 
                         if (!obj.items) {
@@ -179,25 +174,7 @@
                 };
 
                 Bill.build = function(obj) {
-                    var result;
-
-                    if (obj) {
-                        if (obj instanceof Array) {
-                            result = new Array();
-
-                            for (var idx in obj) {
-                                result.push(new Bill(obj[idx]));
-                            }
-
-                        } else {
-                            result = new Bill(obj);
-                        }
-
-                    } else {
-                        result = new Bill();
-                    }
-
-                    return result;
+                    return build(Bill, obj, false);
                 };
 
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -213,10 +190,10 @@
                         this.residents = [];
 
                     } else {
-                        if (!obj.id) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
                         this.id = obj.id;
 
-                        if (!obj.number) throw DOMAIN_OBJ + ": " + ERROR.NO_NUMBER_FOUND;
+                        if (obj.number === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_NUMBER_FOUND;
                         // If possible, convert to number so it can be ordered
                         if (!isNaN(parseInt(obj.number))) {
                             this.number = parseInt(obj.number);
@@ -230,25 +207,7 @@
                 };
 
                 Apartment.build = function(obj) {
-                    var result;
-
-                    if (obj) {
-                        if (obj instanceof Array) {
-                            result = new Array();
-
-                            for (var idx in obj) {
-                                result.push(new Apartment(obj[idx]));
-                            }
-
-                        } else {
-                            result = new Apartment(obj);
-                        }
-
-                    } else {
-                        result = new Apartment();
-                    }
-
-                    return result;
+                    return build(Apartment, obj, false);
                 };
 
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -260,17 +219,20 @@
 
                     if (!obj) {
                         this.id = null;
-                        this.apartment = new Apartment();
+                        this.apartment = Apartment.build();
                         this.fees = [];
                         this.apartmentNumber = this.apartment.number;
 
                     } else {
-                        if (!obj.id) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
                         this.id = obj.id;
 
-                        if (!obj.apartment) throw DOMAIN_OBJ + ": " + ERROR.NO_APARTMENT_FOUND;
+                        if (obj.apartment === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_APARTMENT_FOUND;
                         this.apartment = obj.apartment;
-                        this.apartmentNumber = obj.apartment.apartmentNumber;
+
+                        if (obj.apartment) {
+                            this.apartmentNumber = obj.apartment.apartmentNumber;
+                        }
 
                         if (!obj.fees) {
                             this.fees = [];
@@ -279,89 +241,45 @@
                         }
                     }
 
-                    Object.defineProperty(this, "hasFee", {
-                        get: function () {
-                            return this.fees.length > 0;
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
+                    this.hasFee = function () {
+                        return this.fees.length > 0;
+                    };
 
-                    Object.defineProperty(this, "totalFee", {
-                        get: function () {
-                            var total = 0;
-
-                            for (var feeIdx in this.fees) {
-                                total += this.fees[feeIdx].totalFee;
+                    this.hasPayment= function () {
+                        for (var feeIdx in this.fees) {
+                            if (this.fees[feeIdx].payments.length > 0) {
+                                return true;
                             }
+                        }
 
-                            return total;
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
+                        return false;
+                    };
 
-                    Object.defineProperty(this, "hasPayment", {
-                        get: function () {
-                            for (var feeIdx in this.fees) {
-                                if (this.fees[feeIdx].payments.length > 0) {
-                                    return true;
-                                }
+                    this.getTotals = function() {
+                        var totalFee = 0;
+                        var totalPayment = 0;
 
-                                return false;
-                            }
+                        for (var feeIdx in this.fees) {
+                            totalFee += this.fees[feeIdx].totalFee;
+                            totalPayment += this.fees[feeIdx].totalPayment;
+                        }
 
-                            return total;
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
+                        return {
+                            fee: totalFee,
+                            payment: totalPayment
+                        };
+                    };
 
-                    Object.defineProperty(this, "totalPayment", {
-                        get: function () {
-                            var total = 0;
-
-                            for (var feeIdx in this.fees) {
-                                total += this.fees[feeIdx].totalPayment;
-                            }
-
-                            return total;
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
-
-                    Object.defineProperty(this, "paymentStatus", {
-                        get: function () {
-                            var diff = this.totalPayment - this.totalFee;
-                            return diff >= 0 ? "ok" : (this.totalPayment > 0 ? "partial" : "none");
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
+                    this.getPaymentStatus= function () {
+                        var totals = this.getTotals();
+                        var diff = totals.totalPayment - totals.totalFee;
+                        return diff >= 0 ? "ok" : (this.totalPayment > 0 ? "partial" : "none");
+                    };
 
                 };
 
-                ApartmentBalance.build = function(obj) {
-                    var result;
-
-                    if (obj) {
-                        if (obj instanceof Array) {
-                            result = new Array();
-
-                            for (var idx in obj) {
-                                result.push(new ApartmentBalance(obj[idx]));
-                            }
-
-                        } else {
-                            result = new ApartmentBalance(obj);
-                        }
-
-                    } else {
-                        result = new ApartmentBalance();
-                    }
-
-                    return result;
+                ApartmentBalance.build = function(obj, asMap) {
+                    return build(ApartmentBalance, obj, asMap);
                 };
 
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -373,68 +291,76 @@
 
                     if (!obj) {
                         this.id = null;
-                        this.apartmentsBalance = [];
+                        this.apartmentsBalance = null;
 
                     } else {
-                        if (!obj.id) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
                         this.id = obj.id;
 
                         if (!obj.apartmentsBalance) {
-                            this.apartmentsBalance = [];
+                            this.apartmentsBalance = { };
+
                         } else {
-                            this.apartmentsBalance = ApartmentBalance.build(obj.apartmentsBalance);
+                            this.apartmentsBalance = ApartmentBalance.build(obj.apartmentsBalance, true);
                         }
                     }
 
-                    Object.defineProperty(this, "totalFee", {
-                        get: function () {
-                            var total = 0;
+                    this.getTotals = function () {
+                        var totals = {
+                            fee: 0,
+                            payment: 0
+                        };
 
-                            for (var abIdx in this.apartmentsBalance) {
-                                total += this.apartmentsBalance[abIdx].totalFee;
-                            }
+                        for (var abIdx in this.apartmentsBalance) {
+                            var abTotals = this.apartmentsBalance[abIdx].getTotals();
 
-                            return total;
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
+                            totals.fee += abTotals.fee;
+                            totals.payment += abTotals.payment;
+                        }
 
-                    Object.defineProperty(this, "totalPayment", {
-                        get: function () {
-                            var total = 0;
-
-                            for (var abIdx in this.apartmentsBalance) {
-                                total += this.apartmentsBalance[abIdx].totalPayment;
-                            }
-
-                            return total;
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
+                        return totals;
+                    };
                 };
 
                 ApartmentBalanceGroup.build = function(obj) {
-                    var result;
+                    return build(ApartmentBalanceGroup, obj, false);
+                };
 
-                    if (obj) {
-                        if (obj instanceof Array) {
-                            result = new Array();
+                // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+                // MONTHLY BALANCE
+                // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-                            for (var idx in obj) {
-                                result.push(new ApartmentBalanceGroup(obj[idx]));
-                            }
+                var MonthlyBalance = function(obj) {
+                    var DOMAIN_OBJ = "MonthlyBalance";
 
-                        } else {
-                            result = new ApartmentBalanceGroup(obj);
-                        }
+                    if (!obj) {
+                        this.id = null;
+                        this.referenceMonth = new Date();
+                        this.balanceGroups = {
+                            INCOMES: null
+                        };
 
                     } else {
-                        result = new ApartmentBalanceGroup();
-                    }
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        this.id = obj.id;
 
-                    return result;
+                        if (obj.referenceMonth === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_REF_DATE_FOUND;
+                        this.referenceMonth = obj.referenceMonth;
+
+                        if (obj.balanceGroups === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_BALANCE_GROUPS_FOUND;
+                        this.balanceGroups = obj.balanceGroups;
+
+                        if (obj.balanceGroups.INCOMES === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_BALANCE_GROUPS_FOUND + " (INCOMES)";
+                        this.balanceGroups.INCOMES = ApartmentBalanceGroup.build(obj.balanceGroups.INCOMES);
+
+                        this.getIncomeTotals = function () {
+                            return this.balanceGroups.INCOMES.getTotals();
+                        };
+                    }
+                };
+
+                MonthlyBalance.build = function(obj) {
+                    return build(MonthlyBalance, obj, false);
                 };
 
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -446,6 +372,7 @@
                 this.Apartment = Apartment;
                 this.ApartmentBalance = ApartmentBalance;
                 this.ApartmentBalanceGroup = ApartmentBalanceGroup;
+                this.MonthlyBalance = MonthlyBalance;
             }
         ]
     );

@@ -63,18 +63,25 @@ public class LazyCollectionNullifier {
     }
     @SuppressWarnings("unchecked")
     private void executeSingle(final Object obj) {
-        if (obj != null) {
-            if (!verified.contains(obj)) {
-                verified.add(obj);
-                Class cls = obj.getClass();
+        if (obj != null && !obj.getClass().equals(Object.class)) {
+            try {
+                if (!verified.contains(obj)) {
+                    verified.add(obj);
+                    Class cls = obj.getClass();
 
-                processFields(cls, obj);
+                    processFields(cls, obj);
 
-                while (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
-                    cls = cls.getSuperclass();
-                    Object superObj = cls.cast(obj);
-                    processFields(cls, superObj);
+                    while (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
+                        cls = cls.getSuperclass();
+                        Object superObj = cls.cast(obj);
+                        processFields(cls, superObj);
+                    }
                 }
+            } catch (final NullPointerException e) {
+                e.printStackTrace();
+
+            } catch (final StackOverflowError e) {
+                e.printStackTrace();
             }
         }
     }
