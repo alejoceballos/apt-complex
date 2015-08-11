@@ -3,8 +3,10 @@
 
     var app = angular.module('apt-complex-app',
         [
-            'apt-complex-apartment',
-            'apt-complex-menu-bar',
+            'app-i18n',
+            'app-remote-api',
+            'app-view-menu-bar',
+            'app-summary',
             'ngRoute',
             'ui.bootstrap',
             'ui.bootstrap.tpls',
@@ -12,6 +14,8 @@
             'ngAnimate',
             'ngResource'
         ]);
+
+    var VIEW_PATH = '/javascript/view/';
 
     app.config(
         [
@@ -21,10 +25,10 @@
 
                 $routeProvider.
                     when('/about', {
-                        templateUrl: '/javascript/about/about.tpl.html'
+                        templateUrl: VIEW_PATH + 'about/about.tpl.html'
                     }).
-                    when('/apartment', {
-                        templateUrl: '/javascript/apartment/apartment.tpl.html'
+                    when('/summary', {
+                        templateUrl: VIEW_PATH + 'summary/summary.tpl.html'
                     }).
                     otherwise({
                         redirectTo: '/about'

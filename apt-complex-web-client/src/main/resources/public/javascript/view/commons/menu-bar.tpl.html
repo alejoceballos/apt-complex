@@ -1,0 +1,120 @@
+<nav class="navbar navbar-inverse navbar-fixed-top nav-shadow" ng-controller="MenuBarController as menuBarCtrl">
+    <div class="container">
+        <div class="navbar-header">
+            <span class="navbar-brand">
+                <span><img src="/images/logo.png">&nbsp;</span>
+            </span>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/#/summary" translate="MENU_SUMMARY">Summary</a>
+                </li>
+
+                <li class="dropdown">
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                        <span translate="MENU_INCOMES">Incomes</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a href="" translate="MENU_FEES">Fees</a>
+                        </li>
+                        <li>
+                            <a href="" translate="MENU_BANKS">Banks</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                        <span translate="MENU_EXPENSES">Expenses</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li class="dropdown-header" translate="MENU_PERSONNEL">Personnel</li>
+                        <li>
+                            <a href="">Payroll</a>
+                        </li>
+                        <li>
+                            <a href="">Social charges</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Utilities</li>
+                        <li>
+                            <a href="">Water</a>
+                        </li>
+                        <li>
+                            <a href="">Electricity</a>
+                        </li>
+                        <li>
+                            <a href="">Telephone</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="dropdown-header">Contracts</li>
+                        <li>
+                            <a href="">Contracts</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="">Others</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="/#/about" translate="MENU_ABOUT">About...</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+
+                <li class="dropdown">
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                        {{ data.referenceDate | amDateFormat:'MMMM YYYY' }}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <datetimepicker data-ng-model="data.referenceDate"
+                                        data-datetimepicker-config="{
+                                            startView: 'month',
+                                            minView: 'month' }"></datetimepicker>
+                    </ul>
+                </li>
+
+                <li>
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                                <img ng-src="/images/{{data.language}}.png">
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="" ng-click="menuBarCtrl.changeLanguage('en_US')">
+                                        <img src="/images/en_US.png">
+                                        <span translate="MENU_ENGLISH">English</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="" ng-click="menuBarCtrl.changeLanguage('pt_BR')">
+                                        <img src="/images/pt_BR.png">
+                                        <span translate="MENU_PORTUGUESE">Portuguese</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="">
+                        <img id="remote-call-spinner"
+                             src="/images/remote-call-spinner.gif"
+                             style="display: none; width: 24px; height: 24px">
+                        <img id="remote-call-spinner-hidden"
+                             src="/images/remote-call-spinner-hidden.png">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

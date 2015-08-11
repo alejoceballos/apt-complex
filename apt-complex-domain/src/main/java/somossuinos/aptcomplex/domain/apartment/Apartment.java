@@ -1,17 +1,22 @@
 package somossuinos.aptcomplex.domain.apartment;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.AbstractPersistable;
-import somossuinos.aptcomplex.domain.finance.balance.Payment;
-import somossuinos.aptcomplex.domain.finance.bill.Bill;
-import somossuinos.aptcomplex.domain.finance.bill.BillItem;
+import somossuinos.aptcomplex.domain.exception.AptComplexDomainException;
+import somossuinos.aptcomplex.domain.exception.ExceptionMessages;
 import somossuinos.aptcomplex.domain.person.Person;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,11 +28,6 @@ import java.util.Set;
 @Entity
 @Table(name = "apartment")
 public class Apartment extends AbstractPersistable<Long> {
-
-    @Override
-    protected void setId(Long id) {
-        super.setId(id);
-    }
 
     @NotNull
     @Column(name = "number", nullable = false, length = 4, unique = true)
@@ -49,57 +49,12 @@ public class Apartment extends AbstractPersistable<Long> {
         return residents;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinTable(
-            name = "apartment_fee",
-            joinColumns = @JoinColumn(name = "apartment_id", nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "bill_id", nullable = false)
-    )
-    private Set<Bill> fees = new HashSet<>(0);
-
-    public Set<Bill> getFees() {
-        return fees;
-    }
-
     @NotNull
     @Column(name = "version", nullable = false)
     @Version
     private Long version;
 
     protected Apartment() {
-    }
-
-    public BigDecimal totalFee(final int year, final int month) {
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (final Bill fee : fees) {
-            if (fee.getReferenceDate().getYear() == year && fee.getReferenceDate().getMonthOfYear() == month) {
-                total = total.add(fee.totalFee());
-            }
-        }
-
-        return total;
-    }
-
-    public BigDecimal totalPayment(final int year, final int month) {
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (final Bill fee : fees) {
-            if (fee.getReferenceDate().getYear() == year && fee.getReferenceDate().getMonthOfYear() == month) {
-                total = total.add(fee.totalPayment());
-            }
-        }
-
-        return total;
-    }
-
-    public void addPayment(final Payment payment, final int year, final int month) {
-        for (final Bill fee : fees) {
-            if (fee.getReferenceDate().getYear() == year && fee.getReferenceDate().getMonthOfYear() == month) {
-                fee.getPayments().add(payment);
-                return;
-            }
-        }
     }
 
     public static class Builder {
@@ -109,41 +64,23 @@ public class Apartment extends AbstractPersistable<Long> {
             this.apartment = new Apartment();
         }
 
-        public static Builder get() {
-            return new Builder();
+        public static Builder get(final String number) {
+            if (StringUtils.isBlank(number)) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
+            final Builder builder = new Builder();
+            builder.apartment.number = number;
+            return builder;
         }
 
         public Apartment build() {
             return apartment;
         }
 
-        public Builder withId(final Long id) {
-            apartment.setId(id);
-            return this;
-        }
-
-        public Builder withNumber(final String number) {
-            apartment.number = number;
-            return this;
-        }
-
         public Builder withResident(final Person resident) {
+            if (resident == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             apartment.residents.add(resident);
             return this;
         }
 
-        public Builder withFee(final Bill fee) {
-            apartment.fees.add(fee);
-            return this;
-        }
-
-        public Builder withFees(final Set<Bill> fees) {
-            for (Bill fee : fees) {
-                apartment.fees.add(fee);
-            }
-
-            return this;
-        }
     }
 
 }

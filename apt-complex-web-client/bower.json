@@ -6,6 +6,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "jquery": "latest",
+    "jquery-ui": "latest",
     "angular": "latest",
     "angular-mocks": "latest",
     "angular-route": "latest",
@@ -17,8 +19,6 @@
     "angular-sanitize": "latest",
     "angular-scenario": "latest",
     "angular-local-storage": "latest",
-    "jquery": "latest",
-    "jquery-ui": "latest",
     "bootstrap": "latest",
     "angular-dragdrop": "latest",
     "moment": "latest",
@@ -29,7 +29,8 @@
     "textAngular": "latest",
     "font-awesome": "latest",
     "angular-ui-codemirror": "latest",
-    "angular-bootstrap-datetimepicker": "latest"
+    "angular-bootstrap-datetimepicker": "latest",
+    "angular-translate": "latest"
   },
   "resolutions": {
     "angular": "latest"

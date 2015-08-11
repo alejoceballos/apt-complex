@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="apt-complex-app">
 <head>
-    <title>Apt. Complex Manager</title>
+    <title translate="PAGE_TITLE">Apt. Complex Manager</title>
     <link rel="stylesheet" href="stylesheets/vendor.css" />
     <link rel="stylesheet" href="stylesheets/app.css" />
 </head>
-<body ng-app="apt-complex-app">
-    <div ng-include="'javascript/commons/menu-bar.tpl.html'"></div>
+<body>
+    <div ng-include="'javascript/view/commons/menu-bar.tpl.html'"></div>
     <div class="app-view-container">
         <div ng-view></div>
         <div growl></div>
@@ -14,7 +14,9 @@
 
     <script type="text/javascript" src="javascript/vendor.js"></script>
     <script type="text/javascript" src="javascript/app.js"></script>
-    <script type="text/javascript" src="javascript/commons/menu-bar.js"></script>
-    <script type="text/javascript" src="javascript/apartment/apartment.js"></script>
+    <script type="text/javascript" src="javascript/view/commons/i18n.js"></script>
+    <script type="text/javascript" src="javascript/view/commons/remote-api.js"></script>
+    <script type="text/javascript" src="javascript/view/commons/menu-bar.js"></script>
+    <script type="text/javascript" src="javascript/view/summary/summary.js"></script>
 </body>
 </html>

@@ -1,12 +1,13 @@
 package somossuinos.aptcomplex.web.infra;
 
-import java.io.IOException;
+import somossuinos.aptcomplex.infra.LazyCollectionNullifier;
+import somossuinos.aptcomplex.web.api.ApiResult;
+
 import javax.inject.Named;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
-import somossuinos.aptcomplex.domain.infra.LazyCollectionNullifier;
-import somossuinos.aptcomplex.web.api.ApiResult;
+import java.io.IOException;
 
 /**
  * @author ceballos
