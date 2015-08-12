@@ -4,6 +4,7 @@ import org.hibernate.collection.internal.AbstractPersistentCollection;
 import somossuinos.aptcomplex.domain.exception.AptComplexInfraException;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -63,25 +64,25 @@ public class LazyCollectionNullifier {
     }
     @SuppressWarnings("unchecked")
     private void executeSingle(final Object obj) {
-        if (obj != null && !obj.getClass().equals(Object.class)) {
-            try {
-                if (!verified.contains(obj)) {
-                    verified.add(obj);
-                    Class cls = obj.getClass();
+        if (obj != null
+                && !obj.getClass().isEnum()
+                && !obj.getClass().isAnnotation()
+                && !obj.getClass().isPrimitive()
+                && !Object.class.getPackage().equals(obj.getClass().getPackage())
+                && !BigDecimal.class.getPackage().equals(obj.getClass().getPackage())
+                && obj.getClass().getPackage().getName().indexOf("org.joda") != 0) {
 
-                    processFields(cls, obj);
+            if (!verified.contains(obj)) {
+                verified.add(obj);
+                Class cls = obj.getClass();
 
-                    while (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
-                        cls = cls.getSuperclass();
-                        Object superObj = cls.cast(obj);
-                        processFields(cls, superObj);
-                    }
+                processFields(cls, obj);
+
+                while (cls.getSuperclass() != null && !cls.getSuperclass().equals(Object.class)) {
+                    cls = cls.getSuperclass();
+                    Object superObj = cls.cast(obj);
+                    processFields(cls, superObj);
                 }
-            } catch (final NullPointerException e) {
-                e.printStackTrace();
-
-            } catch (final StackOverflowError e) {
-                e.printStackTrace();
             }
         }
     }
