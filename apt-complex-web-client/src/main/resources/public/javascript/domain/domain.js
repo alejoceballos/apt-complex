@@ -144,33 +144,37 @@
                         }
                     }
 
-                    Object.defineProperty(this, "totalFee", {
-                        get: function () {
-                            var total = 0;
+                    this.totals = function () {
+                        var result = {
+                            fee: {
+                                normal: 0,
+                                surcharge: 0,
+                                other: 0
+                            },
+                            payment: 0
+                        };
 
-                            for (var itemIdx in this.items) {
-                                total += this.items[itemIdx].value;
+                        for (var itemIdx in this.items) {
+                            var item = this.items[itemIdx];
+
+                            switch (item.type) {
+                                case "CONDOMINIUM_FEE":
+                                    result.fee.normal = item.value;
+                                    break;
+                                case "CONDOMINIUM_SURCHARGE":
+                                    result.fee.surcharge = item.value;
+                                    break;
+                                default:
+                                    result.fee.other = item.value;
                             }
+                        }
 
-                            return total;
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
+                        for (var pymntIdx in this.payments) {
+                            result.payment += this.payments[pymntIdx].value;
+                        }
 
-                    Object.defineProperty(this, "totalPayment", {
-                        get: function () {
-                            var total = 0;
-
-                            for (var pymntIdx in this.payments) {
-                                total += this.payments[pymntIdx].value;
-                            }
-
-                            return total;
-                        },
-                        enumerable: true,
-                        configurable: false
-                    });
+                        return result;
+                    };
                 };
 
                 Bill.build = function(obj) {
@@ -228,10 +232,12 @@
                         this.id = obj.id;
 
                         if (obj.apartment === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_APARTMENT_FOUND;
-                        this.apartment = obj.apartment;
+                        this.apartment = Apartment.build(obj.apartment);
 
-                        if (obj.apartment) {
-                            this.apartmentNumber = obj.apartment.apartmentNumber;
+                        if (this.apartment) {
+                            this.apartmentNumber = this.apartment.number;
+                        } else {
+                            this.apartmentNumber = null;
                         }
 
                         if (!obj.fees) {
@@ -241,41 +247,31 @@
                         }
                     }
 
-                    this.hasFee = function () {
-                        return this.fees.length > 0;
-                    };
-
-                    this.hasPayment= function () {
-                        for (var feeIdx in this.fees) {
-                            if (this.fees[feeIdx].payments.length > 0) {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    };
-
-                    this.getTotals = function() {
-                        var totalFee = 0;
-                        var totalPayment = 0;
-
-                        for (var feeIdx in this.fees) {
-                            totalFee += this.fees[feeIdx].totalFee;
-                            totalPayment += this.fees[feeIdx].totalPayment;
-                        }
-
-                        return {
-                            fee: totalFee,
-                            payment: totalPayment
+                    this.totals = function() {
+                        var result = {
+                            fee: {
+                                total: 0,
+                                normal: 0,
+                                surcharge: 0,
+                                other: 0
+                            },
+                            payment: 0
                         };
-                    };
 
-                    this.getPaymentStatus= function () {
-                        var totals = this.getTotals();
-                        var diff = totals.totalPayment - totals.totalFee;
-                        return diff >= 0 ? "ok" : (this.totalPayment > 0 ? "partial" : "none");
-                    };
+                        for (var feeIdx in this.fees) {
+                            var feeTotals = this.fees[feeIdx].totals();
 
+                            result.fee.normal +=  feeTotals.fee.normal;
+                            result.fee.surcharge +=  feeTotals.fee.surcharge;
+                            result.fee.other +=  feeTotals.fee.other;
+
+                            result.payment += feeTotals.payment;
+                        }
+
+                        result.fee.total =  feeTotals.fee.normal + result.fee.surcharge + feeTotals.fee.other;
+
+                        return result;
+                    };
                 };
 
                 ApartmentBalance.build = function(obj, asMap) {
@@ -291,7 +287,7 @@
 
                     if (!obj) {
                         this.id = null;
-                        this.apartmentsBalance = null;
+                        this.apartmentsBalance = { };
 
                     } else {
                         if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
@@ -305,20 +301,26 @@
                         }
                     }
 
-                    this.getTotals = function () {
-                        var totals = {
-                            fee: 0,
+                    this.totals = function () {
+                        var result = {
+                            fee: {
+                                normal: 0,
+                                surcharge: 0,
+                                other: 0
+                            },
                             payment: 0
                         };
 
                         for (var abIdx in this.apartmentsBalance) {
-                            var abTotals = this.apartmentsBalance[abIdx].getTotals();
+                            var abTotals = this.apartmentsBalance[abIdx].totals();
 
-                            totals.fee += abTotals.fee;
-                            totals.payment += abTotals.payment;
+                            result.fee.normal +=  abTotals.fee.normal;
+                            result.fee.surcharge +=  abTotals.fee.surcharge;
+                            result.fee.other +=  abTotals.fee.other;
+                            result.payment += abTotals.payment;
                         }
 
-                        return totals;
+                        return result;
                     };
                 };
 
@@ -353,8 +355,19 @@
                         if (obj.balanceGroups.INCOMES === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_BALANCE_GROUPS_FOUND + " (INCOMES)";
                         this.balanceGroups.INCOMES = ApartmentBalanceGroup.build(obj.balanceGroups.INCOMES);
 
-                        this.getIncomeTotals = function () {
-                            return this.balanceGroups.INCOMES.getTotals();
+                        this.totals = function () {
+                            return this.balanceGroups.INCOMES.totals();
+                        };
+
+                        this.apartmentsBalances = function() {
+                            var aptmntBalances = [];
+
+                            for (var abIdx in this.balanceGroups.INCOMES.apartmentsBalance) {
+                                var aptBal = this.balanceGroups.INCOMES.apartmentsBalance[abIdx];
+                                aptmntBalances.push(aptBal);
+                            }
+
+                            return aptmntBalances;
                         };
                     }
                 };

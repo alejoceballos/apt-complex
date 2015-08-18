@@ -5,13 +5,111 @@
     <div class="row" ng-if="summCtrl.data.balance != null">
         <div class="col-xs-6 col-md-6">
             <h3><b translate="SUMMARY_TITLE_INCOMES">Incomes</b></h3>
-            <div class="row">
-                <div class="col-xs-6 col-md-6">
-                    <label translate="SUMMARY_TOTAL_FEE">Total cond. fee</label>: <span>{{ summCtrl.data.totals.fee | currency }}</span>
+            <div class="well well-sm">
+                <div class="left-right">
+                    <div class="left" translate="SUMMARY_TOTAL_PAYMENT">Total payment</div>
+                    <div class="right"><b>{{ summCtrl.data.totals.payment | currency }}</b></div>
                 </div>
-                <div class="col-xs-6 col-md-6">
-                    <label translate="SUMMARY_TOTAL_PAYMENT">Total payment</label>: <span>{{ summCtrl.data.totals.payment | currency }}</span>
+                <div class="left-right">
+                    <div class="left" translate="SUMMARY_TOTAL_FEE">Total cond. fee</div>
+                    <div class="right"><b>{{ summCtrl.data.totals.fee.total | currency }}</b></div>
                 </div>
+            </div>
+
+            <h4><b translate="SUMMARY_TITLE_APARTMENTS">Apartments</b></h4>
+            <div class="left-right">
+                <div class="left" translate="SUMMARY_TOTAL_NORMAL_FEE">Normal fee</div>
+                <div class="right">{{ summCtrl.data.totals.fee.normal | currency }}</div>
+            </div>
+            <div class="left-right">
+                <div class="left" translate="SUMMARY_TOTAL_SURCHARGE">Surcharge</div>
+                <div class="right">{{ summCtrl.data.totals.fee.surcharge | currency }}</div>
+            </div>
+            <div class="left-right">
+                <div class="left" translate="SUMMARY_TOTAL_OTHERS">Surcharge</div>
+                <div class="right">{{ summCtrl.data.totals.fee.other | currency }}</div>
+            </div>
+            <div>
+                <button ng-repeat="aptBal in summCtrl.data.apartmentsBalances track by $index"
+                        ng-class="
+                        {
+                            'btn btn-success btn-md apt-bal': aptBal.totals.payment >= aptBal.totals.fee.total,
+                            'btn btn-danger btn-md apt-bal': aptBal.totals.payment == 0 && aptBal.totals.fee.total > 0,
+                            'btn btn-warning btn-md apt-bal': aptBal.totals.payment > 0 && aptBal.totals.payment < aptBal.totals.fee.total
+                        }"
+                        ns-popover
+                        ns-popover-template="popover"
+                        ns-popover-theme="ns-popover-tooltip-theme"
+                        ns-popover-timeout="0.5"
+                        ns-popover-trigger="click"
+                        ns-popover-placement="right">
+                    <script type="text/ng-template" id="popover">
+                        <div class="triangle"></div>
+                        <div class="ns-popover-tooltip apt-popover">
+                            <ul>
+                                <li class="apt-bal-popover">
+                                    <div class="left-right">
+                                        <div class="left" translate="SUMMARY_DETAIL_CONDOMINIUM_FEE">Fee</div>
+                                        <div class="right">
+                                            <span ng-class="
+                                                {
+                                                    'label label-primary': aptBal.totals.fee.normal > 0,
+                                                    'label label-default': aptBal.totals.fee.normal <= 0
+                                                }">
+                                                {{ aptBal.totals.fee.normal | currency }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="apt-bal-popover">
+                                    <div class="left-right">
+                                        <div class="left" translate="SUMMARY_DETAIL_CONDOMINIUM_SURCHARGE">Surcharge</div>
+                                        <div class="right">
+                                            <span ng-class="
+                                                {
+                                                    'label label-primary': aptBal.totals.fee.surcharge > 0,
+                                                    'label label-default': aptBal.totals.fee.surcharge <= 0
+                                                }">
+                                                {{ aptBal.totals.fee.surcharge | currency }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="apt-bal-popover">
+                                    <div class="left-right">
+                                        <div class="left" translate="SUMMARY_DETAIL_OTHERS">Others</div>
+                                        <div class="right">
+                                            <span ng-class="
+                                                {
+                                                    'label label-primary': aptBal.totals.fee.other > 0,
+                                                    'label label-default': aptBal.totals.fee.other <= 0
+                                                }">
+                                                {{ aptBal.totals.fee.other | currency }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="apt-bal-popover">
+                                    <div class="left-right">
+                                        <div class="left" translate="SUMMARY_DETAIL_PAYMENT">Payment</div>
+                                        <div class="right">
+                                            <span ng-class="
+                                                {
+                                                    'label label-success': aptBal.totals.payment >= (aptBal.totals.fee.normal + aptBal.totals.fee.surcharge + aptBal.totals.fee.other),
+                                                    'label label-warning': aptBal.totals.payment > 0 && aptBal.totals.payment < (aptBal.totals.fee.normal + aptBal.totals.fee.surcharge + aptBal.totals.fee.other),
+                                                    'label label-danger': aptBal.totals.payment == 0 && (aptBal.totals.fee.normal + aptBal.totals.fee.surcharge + aptBal.totals.fee.other) > 0
+                                                }">
+                                                {{ aptBal.totals.payment | currency }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </script>
+
+                    {{ aptBal.apartmentNumber }}
+                </button>
             </div>
         </div>
         <div class="col-xs-6 col-md-6">

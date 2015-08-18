@@ -22,6 +22,35 @@ body {
     min-width: 1030px;
 }
 
+.left-right {
+    display: inline-block;
+    width: 100%;
+}
+
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
+
+.apt-bal {
+    margin: 2px 2px 2px 2px;
+    display: inline-table;
+    width: 10%;
+    font-weight: bold;
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.apt-bal-popover {
+    font-size: 14px;
+}
+
+.ns-popover-tooltip-theme.ns-popover-right-placement.ns-popover-center-align.ng-scope {
+    width: 200px;
+}
+
 /*
 = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 MAIN CONTAINERS

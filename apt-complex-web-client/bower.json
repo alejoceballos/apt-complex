@@ -23,6 +23,7 @@
     "angular-dragdrop": "latest",
     "moment": "latest",
     "angular-moment": "latest",
+    "nsPopover": "latest",
     "flow.js": "latest",
     "ng-flow": "latest",
     "angular-growl-v2": "latest",

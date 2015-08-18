@@ -47,6 +47,23 @@ public class BillWithDueDate extends Bill {
             return new Builder();
         }
 
+        public static Builder get(final BillWithDueDate bill) {
+            final Builder builder = new Builder();
+
+            for (final BillItem item : bill.getItems()) {
+                builder.bill.getItems().add(BillItem.Builder.get(item).build());
+            }
+
+            for (final Payment pymnt : bill.getPayments()) {
+                builder.bill.getPayments().add(Payment.Builder.get(pymnt).build());
+            }
+
+            ((BillWithDueDate) bill).dueDate = bill.dueDate;
+
+
+            return builder;
+        }
+
         public Builder withDueDate(final DateTime dueDate) {
             if (dueDate == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             ((BillWithDueDate) bill).dueDate = dueDate;

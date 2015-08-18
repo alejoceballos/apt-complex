@@ -3,10 +3,12 @@ package somossuinos.aptcomplex.domain.payment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import somossuinos.aptcomplex.domain.exception.AptComplexDomainException;
+import somossuinos.aptcomplex.domain.exception.ExceptionMessages;
 import somossuinos.aptcomplex.infra.JsonJodaDateTimeDeserializer;
 import somossuinos.aptcomplex.infra.JsonJodaDateTimeSerializer;
 
@@ -85,9 +87,12 @@ public class Payment extends AbstractPersistable<Long> {
             return new Builder();
         }
 
-        public static Builder get(final Payment item) {
+        public static Builder get(final Payment payment) {
             final Builder builder = new Builder();
-            builder.payment = item;
+            builder.payment.note = payment.note;
+            builder.payment.type = payment.type;
+            builder.payment.value = payment.value;
+            builder.payment.when = payment.when;
 
             return builder;
         }
@@ -108,21 +113,25 @@ public class Payment extends AbstractPersistable<Long> {
         }
 
         public Builder withValue(final BigDecimal value) {
+            if (value == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             attributes.put("value", value);
             return this;
         }
 
         public Builder withType(final TransactionType type) {
+            if (type == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             attributes.put("type", type);
             return this;
         }
 
         public Builder withWhen(final DateTime when) {
+            if (when == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             attributes.put("when", when);
             return this;
         }
 
         public Builder withNote(final String note) {
+            if (StringUtils.isBlank(note)) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             attributes.put("note", note);
             return this;
         }

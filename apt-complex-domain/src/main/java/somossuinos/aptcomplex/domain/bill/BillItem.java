@@ -1,7 +1,9 @@
 package somossuinos.aptcomplex.domain.bill;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import somossuinos.aptcomplex.domain.exception.AptComplexDomainException;
+import somossuinos.aptcomplex.domain.exception.ExceptionMessages;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -69,7 +71,9 @@ public class BillItem extends AbstractPersistable<Long> {
 
         public static Builder get(final BillItem item) {
             final Builder builder = new Builder();
-            builder.item = item;
+            builder.item.description = item.description;
+            builder.item.type = item.type;
+            builder.item.value = item.value;
 
             return builder;
         }
@@ -90,16 +94,19 @@ public class BillItem extends AbstractPersistable<Long> {
         }
 
         public Builder withType(final BillItemType type) {
+            if (type == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             attributes.put("type", type);
             return this;
         }
 
         public Builder withDescription(final String description) {
+            if (StringUtils.isBlank(description)) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             attributes.put("description", description);
             return this;
         }
 
         public Builder withValue(final BigDecimal value) {
+            if (value == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             attributes.put("value", value);
             return this;
         }

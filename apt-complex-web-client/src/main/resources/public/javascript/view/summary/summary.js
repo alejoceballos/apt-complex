@@ -19,14 +19,30 @@
                         function(result) {
                             if (result.data && result.data != null) {
                                 controllerData.balance = domainService.MonthlyBalance.build(result.data);
-                                controllerData.totals = controllerData.balance.getIncomeTotals();
+                                controllerData.totals = controllerData.balance.totals();
+                                controllerData.totals.fee.total =
+                                    controllerData.totals.fee.normal +
+                                    controllerData.totals.fee.surcharge +
+                                    controllerData.totals.fee.other;
+
+                                controllerData.apartmentsBalances = controllerData.balance.apartmentsBalances();
+                                for (var abIdx in controllerData.apartmentsBalances) {
+                                    var aptBal = controllerData.apartmentsBalances[abIdx];
+                                    aptBal.totals = aptBal.totals();
+                                }
 
                             } else {
                                 controllerData.balance = null;
                                 controllerData.totals = {
-                                    fee: 0,
+                                    fee: {
+                                        total: 0,
+                                        normal: 0,
+                                        surcharge: 0,
+                                        other: 0
+                                    },
                                     payment: 0
                                 };
+                                controllerData.apartmentsBalances = [];
                             }
                         }
                     ).catch(
@@ -57,9 +73,15 @@
     var controllerData = {
         balance: null,
         totals: {
-            payment: 0,
-            fee: 0
-        }
+            fee: {
+                total: 0,
+                normal: 0,
+                surcharge: 0,
+                other: 0
+            },
+            payment: 0
+        },
+        apartmentsBalances: []
     };
 
 })();

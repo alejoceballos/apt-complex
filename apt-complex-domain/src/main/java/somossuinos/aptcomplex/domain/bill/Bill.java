@@ -92,6 +92,20 @@ public class Bill extends AbstractPersistable<Long> {
             return new Builder();
         }
 
+        public static Builder get(final Bill bill) {
+            final Builder builder = new Builder();
+
+            for (final BillItem item : bill.getItems()) {
+                builder.bill.items.add(BillItem.Builder.get(item).build());
+            }
+
+            for (final Payment pymnt : bill.getPayments()) {
+                builder.bill.payments.add(Payment.Builder.get(pymnt).build());
+            }
+
+            return builder;
+        }
+
         public Bill build() {
             return bill;
         }

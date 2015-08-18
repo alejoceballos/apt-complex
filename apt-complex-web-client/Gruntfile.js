@@ -38,7 +38,9 @@ module.exports = function(grunt) { 'use strict';
                     './bower_components/moment/locale/pt-br.js',
                     './bower_components/angular-bootstrap-datetimepicker/datetimepicker.js',
 
-                    './bower_components/angular-translate/angular-translate.js'
+                    './bower_components/angular-translate/angular-translate.js',
+
+                    './bower_components/nsPopover/nsPopover.js'
                 ],
                 dest: './src/main/resources/public/javascript/vendor.js'
             },

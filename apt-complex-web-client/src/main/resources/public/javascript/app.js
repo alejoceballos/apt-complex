@@ -13,7 +13,8 @@
             'ui.bootstrap.tpls',
             'angular-growl',
             'ngAnimate',
-            'ngResource'
+            'ngResource',
+            'nsPopover'
         ]);
 
     var VIEW_PATH = '/javascript/view/';
