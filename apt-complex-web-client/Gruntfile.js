@@ -40,7 +40,9 @@ module.exports = function(grunt) { 'use strict';
 
                     './bower_components/angular-translate/angular-translate.js',
 
-                    './bower_components/nsPopover/nsPopover.js'
+                    './bower_components/nsPopover/nsPopover.js',
+
+                    './bower_components/ng-table/dist/ng-table.js'
                 ],
                 dest: './src/main/resources/public/javascript/vendor.js'
             },
@@ -49,7 +51,8 @@ module.exports = function(grunt) { 'use strict';
                     './bower_components/bootstrap/dist/css/bootstrap.css',
                     './bower_components/font-awesome/font-awesome.css',
                     './bower_components/angular-growl-v2/angular-growl.css',
-                    './bower_components/angular-bootstrap-datetimepicker/datetimepicker.css'
+                    './bower_components/angular-bootstrap-datetimepicker/datetimepicker.css',
+                    './bower_components/ng-table/dist/ng-table.css'
                 ],
                 dest: './src/main/resources/public/stylesheets/vendor.css'
             }

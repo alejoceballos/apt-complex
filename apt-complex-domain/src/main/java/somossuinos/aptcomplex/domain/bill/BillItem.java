@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -26,14 +27,15 @@ import java.util.Map;
 public class BillItem extends AbstractPersistable<Long> {
 
     @NotNull
-    @Column(name = "type", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 50)
     private BillItemType type;
 
     public BillItemType getType() {
         return type;
     }
 
+    @Size(max = 255)
     @Column(name = "description", length = 255)
     private String description;
 
@@ -50,8 +52,8 @@ public class BillItem extends AbstractPersistable<Long> {
     }
 
     @NotNull
-    @Column(name = "version", nullable = false)
     @Version
+    @Column(name = "version", nullable = false)
     private Long version;
 
     protected BillItem() {

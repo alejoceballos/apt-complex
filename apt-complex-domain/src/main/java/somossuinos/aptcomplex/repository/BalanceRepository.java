@@ -3,9 +3,8 @@ package somossuinos.aptcomplex.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import somossuinos.aptcomplex.domain.balance.BalanceType;
 import somossuinos.aptcomplex.domain.balance.MonthlyBalance;
-import somossuinos.aptcomplex.domain.balance.ReferenceMonth;
+import somossuinos.aptcomplex.domain.ReferenceMonth;
 
 /**
  * Created by ceballos on 07/08/15.
@@ -22,6 +21,7 @@ public interface BalanceRepository extends JpaRepository<MonthlyBalance, Long> {
             "where b.referenceMonth = :month " +
             "and bg.type = 'INCOMES' ")
     MonthlyBalance findWithApartmentsAndFeesByReferenceMonth(
-            @Param("month") final ReferenceMonth month);
+            @Param("month") final ReferenceMonth month
+    );
 
 }

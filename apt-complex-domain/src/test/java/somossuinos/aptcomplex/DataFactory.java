@@ -1,5 +1,6 @@
 package somossuinos.aptcomplex;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.joda.time.DateTime;
 import somossuinos.aptcomplex.domain.apartment.Apartment;
 import somossuinos.aptcomplex.domain.balance.ApartmentBalance;
@@ -7,13 +8,16 @@ import somossuinos.aptcomplex.domain.balance.ApartmentBalanceGroup;
 import somossuinos.aptcomplex.domain.balance.BalanceDivergence;
 import somossuinos.aptcomplex.domain.balance.DivergenceType;
 import somossuinos.aptcomplex.domain.balance.MonthlyBalance;
-import somossuinos.aptcomplex.domain.balance.ReferenceMonth;
+import somossuinos.aptcomplex.domain.ReferenceMonth;
 import somossuinos.aptcomplex.domain.bill.BillItem;
 import somossuinos.aptcomplex.domain.bill.BillItemType;
 import somossuinos.aptcomplex.domain.bill.BillWithDueDate;
 import somossuinos.aptcomplex.domain.payment.Payment;
 import somossuinos.aptcomplex.domain.payment.TransactionType;
 import somossuinos.aptcomplex.domain.person.Person;
+import somossuinos.aptcomplex.domain.statement.ApartmentStatement;
+import somossuinos.aptcomplex.domain.statement.ApartmentStatementGroup;
+import somossuinos.aptcomplex.domain.statement.MonthlyStatement;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -24,6 +28,10 @@ import java.util.Random;
 import java.util.Set;
 
 public class DataFactory {
+
+    public static final short YEAR = 2015;
+    public static final short FIRST_MONTH = 3;
+    public static final short LAST_MONTH = 7;
 
     public static Map<String, Person> people() {
         final Map<String, Person> people = new HashMap<>();
@@ -102,21 +110,98 @@ public class DataFactory {
         return apartments;
     }
 
-    public static Set<MonthlyBalance> monthlyBalances(final Collection<Apartment> apartments) {
-        final BigDecimal feeValue = BigDecimal.valueOf(800.00);
-        final BigDecimal surchargeValue = BigDecimal.valueOf(250.00);
-
-        final short year = 2015;
-        final short firstMonth = 3;
-        final short lastMonth = 7;
+    public static Set<MonthlyStatement> monthlyStatements(final Collection<Apartment> apartments) {
         final short dueDay = 10;
 
         final Random randomInt = new Random();
 
-        final Set<MonthlyBalance> monthlyBalances = new HashSet<>(lastMonth);
+        final Set<MonthlyStatement> monthlyStatements = new HashSet<>(LAST_MONTH);
 
         // For each month in year...
-        for (short month = firstMonth; month <= lastMonth; month++) {
+        for (short month = FIRST_MONTH; month <= LAST_MONTH; month++) {
+            if (month != 6) {
+                final Set<ApartmentStatement> apartmentStatements = new HashSet<>(apartments.size());
+
+                // ... Create a set of Apartment Statements
+                for (final Apartment apartment : apartments) {
+                    // With basic condo fees
+                    final ApartmentStatement.Builder builder = ApartmentStatement.Builder.get(apartment);
+
+                    final int random = randomInt.nextInt(3);
+
+                    // With or without payments
+                    if (random > 0) {
+                        if (random == 1) {
+                            builder.withFeePaid().withSurchargePaid();
+                        } else if (random == 2) {
+                            builder.withFeePaid();
+                        }
+                    }
+
+                    apartmentStatements.add(builder.build());
+                }
+
+                final Random randomVal = new Random();
+
+                monthlyStatements.add(MonthlyStatement.Builder.get(new ReferenceMonth(YEAR, month))
+                        .withStatementGroup(ApartmentStatementGroup.Builder.get()
+                                .withApartmentStatements(apartmentStatements)
+                                .withTotalFee(BigDecimal.valueOf(randomVal.nextInt(30_000)))
+                                .withTotalSurcharge(BigDecimal.valueOf(randomVal.nextInt(9_000)))
+                                .build())
+                        .build());
+            }
+        }
+
+        monthlyStatements.add(
+                MonthlyStatement.Builder.get(new ReferenceMonth(YEAR, (short) 6))
+                        .withStatementGroup(
+                                ApartmentStatementGroup.Builder.get()
+                                        .withApartmentStatements(juneOf2015Statements(apartments))
+                                        .withTotalFee(BigDecimal.valueOf(25_350L))
+                                        .withTotalSurcharge(BigDecimal.valueOf(8_500L))
+                                        .build())
+                        .build());
+
+        return monthlyStatements;
+    }
+
+    public static Set<ApartmentStatement> juneOf2015Statements(final Collection<Apartment> apartments) {
+        final Set<ApartmentStatement> apartmentStatements = new HashSet<>(apartments.size());
+
+        for (final Apartment apartment : apartments) {
+            final ApartmentStatement.Builder builder = ApartmentStatement.Builder.get(apartment);
+
+            final String[] feeNotPaid = {"201", "301", "1201"};
+
+            if (!ArrayUtils.contains(feeNotPaid, apartment.getNumber())) {
+                builder.withFeePaid();
+            }
+
+            final String[] surchargeNotPaid = {"301", "1201"};
+
+            if (!ArrayUtils.contains(surchargeNotPaid, apartment.getNumber())) {
+                builder.withSurchargePaid();
+            }
+
+            apartmentStatements.add(builder.build());
+        }
+
+        return apartmentStatements;
+    }
+
+    public static Set<MonthlyBalance> monthlyBalances(final Collection<Apartment> apartments) {
+        final BigDecimal feeValue = BigDecimal.valueOf(800.00);
+        final BigDecimal surchargeValue = BigDecimal.valueOf(250.00);
+
+        final short dueDay = 10;
+
+        final Random randomInt = new Random();
+
+        final Set<MonthlyBalance> monthlyBalances = new HashSet<>(LAST_MONTH);
+
+        // For each month in year...
+        for (short month = FIRST_MONTH; month <= LAST_MONTH; month++) {
             if (month != 6) {
                 final Set<ApartmentBalance> apartmentBalances = new HashSet<>(apartments.size());
 
@@ -124,7 +209,7 @@ public class DataFactory {
                 for (final Apartment apartment : apartments) {
                     // With basic condo fees
                     final BillWithDueDate.Builder feeBuilder = BillWithDueDate.Builder.get()
-                            .withDueDate(new DateTime(year, month, dueDay, 0, 0))
+                            .withDueDate(new DateTime(YEAR, month, dueDay, 0, 0))
                             .withItem(BillItem.Builder.get()
                                     .withType(BillItemType.CONDOMINIUM_FEE)
                                     .withValue(feeValue)
@@ -143,7 +228,7 @@ public class DataFactory {
                         feeBuilder.withPayment(Payment.Builder.get()
                                 .withValue(paymentVal)
                                 .withType(TransactionType.INCOME)
-                                .withWhen(new DateTime(year, month, 11, 0, 0))
+                                .withWhen(new DateTime(YEAR, month, 11, 0, 0))
                                 .withNote("DO NOT KNOW THE EXACT DATE OF PAYMENT. WILL ASSUME AFTER DAY 10, SO NO DISCOUNT")
                                 .build());
                     }
@@ -153,7 +238,7 @@ public class DataFactory {
                             .build());
                 }
 
-                monthlyBalances.add(MonthlyBalance.Builder.get(new ReferenceMonth(year, month))
+                monthlyBalances.add(MonthlyBalance.Builder.get(new ReferenceMonth(YEAR, month))
                         .withBalanceGroup(ApartmentBalanceGroup.Builder.get()
                                 .withApartmentBalances(apartmentBalances)
                                 .withDivergence(BalanceDivergence.Builder.get(DivergenceType.FEES_PAYMENTS)
@@ -163,15 +248,15 @@ public class DataFactory {
                                 .build())
                         .build());
             }
-
-            monthlyBalances.add(
-                    MonthlyBalance.Builder.get(new ReferenceMonth(year, (short) 6))
-                            .withBalanceGroup(
-                                    ApartmentBalanceGroup.Builder.get()
-                                            .withApartmentBalances(juneOf2015Balances(apartments))
-                                            .build())
-                            .build());
         }
+
+        monthlyBalances.add(
+                MonthlyBalance.Builder.get(new ReferenceMonth(YEAR, (short) 6))
+                        .withBalanceGroup(
+                                ApartmentBalanceGroup.Builder.get()
+                                        .withApartmentBalances(juneOf2015Balances(apartments))
+                                        .build())
+                        .build());
 
         return monthlyBalances;
     }
@@ -181,7 +266,6 @@ public class DataFactory {
         final BigDecimal surchargeValue = BigDecimal.valueOf(250.00);
         final BigDecimal discountValue = BigDecimal.valueOf(-50.00);
 
-        final short year = 2015;
         final short month = 6;
         final short dueDay = 10;
 
@@ -192,11 +276,11 @@ public class DataFactory {
 
             if (apartment.getNumber().equals("703")) {
                 feeBuilder = BillWithDueDate.Builder.get()
-                        .withDueDate(new DateTime(year, month, 20, 0, 0));
+                        .withDueDate(new DateTime(YEAR, month, 20, 0, 0));
 
             } else {
                 feeBuilder = BillWithDueDate.Builder.get()
-                        .withDueDate(new DateTime(year, month, dueDay, 0, 0));
+                        .withDueDate(new DateTime(YEAR, month, dueDay, 0, 0));
             }
 
             feeBuilder
@@ -223,7 +307,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -244,7 +328,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -265,7 +349,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -276,7 +360,7 @@ public class DataFactory {
                         Payment.Builder.get()
                                 .withType(TransactionType.INCOME)
                                 .withValue(BigDecimal.valueOf(250))
-                                .withWhen(new DateTime(year, month, 10, 0, 0))
+                                .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                 .withNote("NO CONDO FEE (CONDO ADMIN), BUT NO DISCOUNT")
                                 .build()
                 );
@@ -285,7 +369,7 @@ public class DataFactory {
                 feeBuilder.withItem(
                         BillItem.Builder.get()
                                 .withType(BillItemType.CONDOMINIUM_FEE)
-                                .withValue(BigDecimal.valueOf(1100 + 250))
+                                .withValue(BigDecimal.valueOf(1100))
                                 .build())
                         .withItem(
                                 BillItem.Builder.get()
@@ -295,8 +379,8 @@ public class DataFactory {
                         .withPayment(
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
-                                        .withValue(BigDecimal.valueOf(1050))
-                                        .withWhen(new DateTime(year, month, 3, 0, 0))
+                                        .withValue(BigDecimal.valueOf(1050 + 250))
+                                        .withWhen(new DateTime(YEAR, month, 3, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                 );
@@ -317,7 +401,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 8, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 8, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -344,7 +428,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -365,7 +449,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -386,7 +470,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 3, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 3, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -407,7 +491,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(950 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -428,7 +512,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -449,7 +533,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -470,7 +554,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -491,7 +575,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 8, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 8, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -512,13 +596,13 @@ public class DataFactory {
                                 BillItem.Builder.get()
                                         .withType(BillItemType.CUSTOM)
                                         .withDescription("TEST BILLET")
-                                        .withValue(discountValue)
+                                        .withValue(BigDecimal.valueOf(5))
                                         .build())
                         .withPayment(
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
-                                        .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 8, 0, 0))
+                                        .withValue(BigDecimal.valueOf(750 + 250 + 5))
+                                        .withWhen(new DateTime(YEAR, month, 8, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT. TEST BILLET SHOULD NOT BE PAID!")
                                         .build()
                         );
@@ -539,13 +623,13 @@ public class DataFactory {
                                 BillItem.Builder.get()
                                         .withType(BillItemType.CUSTOM)
                                         .withDescription("TEST BILLET")
-                                        .withValue(discountValue)
+                                        .withValue(BigDecimal.valueOf(5))
                                         .build())
                         .withPayment(
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
-                                        .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withValue(BigDecimal.valueOf(750 + 250 + 5))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT. TEST BILLET SHOULD NOT BE PAID!")
                                         .build()
                         );
@@ -566,7 +650,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -587,7 +671,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -608,7 +692,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -623,8 +707,8 @@ public class DataFactory {
                         .withPayment(
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
-                                        .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 22, 0, 0))
+                                        .withValue(BigDecimal.valueOf(800 + 250))
+                                        .withWhen(new DateTime(YEAR, month, 22, 0, 0))
                                         .withNote("PAID AFTER DUE DATE. NO DISCOUNT")
                                         .build()
                         );
@@ -645,7 +729,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 5, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 5, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -666,7 +750,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 2, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 2, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -687,7 +771,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -708,7 +792,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 9, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 9, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -729,7 +813,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 5, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 5, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -750,7 +834,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 9, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 9, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -771,7 +855,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 2, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 2, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -792,7 +876,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -813,7 +897,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -829,7 +913,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(800 + 250))
-                                        .withWhen(new DateTime(year, month, 9, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 9, 0, 0))
                                         .withNote("THERE IS A MISTAKE! HE SHOULD HAVE GOTTEN THE DISCOUNT!")
                                         .build()
                         );
@@ -850,7 +934,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 8, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 8, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -871,7 +955,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -898,7 +982,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 10, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 10, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -919,7 +1003,7 @@ public class DataFactory {
                                 Payment.Builder.get()
                                         .withType(TransactionType.INCOME)
                                         .withValue(BigDecimal.valueOf(750 + 250))
-                                        .withWhen(new DateTime(year, month, 5, 0, 0))
+                                        .withWhen(new DateTime(YEAR, month, 5, 0, 0))
                                         .withNote("PAID UNTIL DUE DATE. 50.00 DISCOUNT")
                                         .build()
                         );
@@ -931,7 +1015,6 @@ public class DataFactory {
         }
 
         return apartmentBalances;
-
     }
 
 }

@@ -31,7 +31,8 @@
     "font-awesome": "latest",
     "angular-ui-codemirror": "latest",
     "angular-bootstrap-datetimepicker": "latest",
-    "angular-translate": "latest"
+    "angular-translate": "latest",
+    "ng-table": "latest"
   },
   "resolutions": {
     "angular": "latest"

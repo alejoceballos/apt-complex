@@ -5,12 +5,16 @@ import somossuinos.aptcomplex.domain.exception.AptComplexDomainException;
 import somossuinos.aptcomplex.domain.exception.ExceptionMessages;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -21,10 +25,20 @@ import java.util.Set;
  */
 @Entity
 @DiscriminatorValue("INCOMES")
+@Table(name = "apartment_balance_group")
 public class ApartmentBalanceGroup extends EntityBalanceGroup {
 
+    @Size(max = 255)
+    @Column(name = "description", length = 255)
+    protected String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    @NotNull
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "entity_balance_group_id", nullable = false)
+    @JoinColumn(name = "apartment_balance_group_id", nullable = false)
     @MapKeyColumn(name = "apartment_number")
     private Map<String, ApartmentBalance> apartmentsBalance = new HashMap<>(0);
 
@@ -64,7 +78,8 @@ public class ApartmentBalanceGroup extends EntityBalanceGroup {
         }
 
         public Builder withDescription(final String description) {
-            super.withDescription(description);
+            if (description == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
+            ((ApartmentBalanceGroup) group).description = description;
             return this;
         }
 
@@ -72,7 +87,6 @@ public class ApartmentBalanceGroup extends EntityBalanceGroup {
             super.withDivergence(divergence);
             return this;
         }
-
 
         public ApartmentBalanceGroup build() {
             return (ApartmentBalanceGroup) group;

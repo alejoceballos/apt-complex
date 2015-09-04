@@ -1,6 +1,7 @@
-package somossuinos.aptcomplex.domain.balance;
+package somossuinos.aptcomplex.domain.statement;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
+import somossuinos.aptcomplex.domain.balance.BalanceType;
 import somossuinos.aptcomplex.domain.ReferenceMonth;
 import somossuinos.aptcomplex.domain.exception.AptComplexDomainException;
 import somossuinos.aptcomplex.domain.exception.ExceptionMessages;
@@ -22,30 +23,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A monthly balance has all detailed income and expense of the related
- * month.
+ * A statement is the balance summary presented to each apartment owner / responsible
+ * every month so it can keep up with condominium accounts.
  * <p>
- *     All bills, payments made by those responsible for the  apartments and
- *     all expenses are detailed in this class aggregates.
+ *     Differently from monthly balance, it presents only totals of each type of
+ *     income and expense.
  * </p>
  *
  * @author ceballos
- * @since 2015-08-03
+ * @since 2015-08-31
  */
 @Entity
-@Table(name = "monthly_balance")
-public class MonthlyBalance extends AbstractPersistable<Long> {
+@Table(name = "monthly_statement")
+public class MonthlyStatement extends AbstractPersistable<Long> {
 
     @NotNull
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "monthly_balance_id", nullable = false)
+    @JoinColumn(name = "monthly_statement_id", nullable = false)
     @MapKeyColumn(name = "type")
     @MapKeyEnumerated(EnumType.STRING)
-    private Map<BalanceType, EntityBalanceGroup> balanceGroups = new HashMap<>();
-
-    public Map<BalanceType, EntityBalanceGroup> getBalanceGroups() {
-        return balanceGroups;
-    }
+    private Map<BalanceType, EntityStatementGroup> statementGroups = new HashMap<>();
 
     @NotNull
     @Embedded
@@ -60,33 +57,32 @@ public class MonthlyBalance extends AbstractPersistable<Long> {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    protected MonthlyBalance() {
+    protected MonthlyStatement() {
     }
 
     public static class Builder {
 
-        private MonthlyBalance balance;
+        private MonthlyStatement statement;
 
         private Builder() {
-            balance = new MonthlyBalance();
+            statement = new MonthlyStatement();
         }
 
         public static Builder get(final ReferenceMonth referenceMonth) {
             if (referenceMonth == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
             final Builder builder = new Builder();
-            builder.balance.referenceMonth = referenceMonth;
+            builder.statement.referenceMonth = referenceMonth;
             return builder;
         }
 
-        public Builder withBalanceGroup(final EntityBalanceGroup group) {
+        public Builder withStatementGroup(final EntityStatementGroup group) {
             if (group == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
-
-            balance.balanceGroups.put(group.getType(), group);
+            statement.statementGroups.put(group.getType(), group);
             return this;
         }
 
-        public MonthlyBalance build() {
-            return balance;
+        public MonthlyStatement build() {
+            return statement;
         }
     }
 

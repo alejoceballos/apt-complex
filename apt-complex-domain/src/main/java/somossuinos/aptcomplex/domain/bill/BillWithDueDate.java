@@ -24,10 +24,10 @@ import javax.validation.constraints.NotNull;
 public class BillWithDueDate extends Bill {
 
     @NotNull
-    @Column(name = "due_date", nullable = false)
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @JsonSerialize(using = JsonJodaDateTimeSerializer.class)
     @JsonDeserialize(using = JsonJodaDateTimeDeserializer.class)
+    @Column(name = "due_date", nullable = false)
     private DateTime dueDate;
 
     public DateTime getDueDate() {

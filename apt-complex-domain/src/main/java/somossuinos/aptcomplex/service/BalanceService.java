@@ -4,7 +4,7 @@ import somossuinos.aptcomplex.domain.balance.ApartmentBalanceGroup;
 import somossuinos.aptcomplex.domain.balance.BalanceType;
 import somossuinos.aptcomplex.domain.balance.EntityBalanceGroup;
 import somossuinos.aptcomplex.domain.balance.MonthlyBalance;
-import somossuinos.aptcomplex.domain.balance.ReferenceMonth;
+import somossuinos.aptcomplex.domain.ReferenceMonth;
 import somossuinos.aptcomplex.repository.BalanceRepository;
 
 import javax.inject.Inject;

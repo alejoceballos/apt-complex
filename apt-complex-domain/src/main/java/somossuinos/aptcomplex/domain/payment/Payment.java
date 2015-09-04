@@ -19,6 +19,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -61,6 +62,7 @@ public class Payment extends AbstractPersistable<Long> {
         return when;
     }
 
+    @Size(max = 255)
     @Column(name = "note", length = 255)
     private String note;
 
@@ -68,8 +70,9 @@ public class Payment extends AbstractPersistable<Long> {
         return note;
     }
 
-    @Column(name = "version", nullable = false)
+    @NotNull
     @Version
+    @Column(name = "version", nullable = false)
     private Long version;
 
     protected Payment() {

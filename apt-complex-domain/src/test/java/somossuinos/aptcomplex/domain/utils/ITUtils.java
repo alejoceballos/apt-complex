@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import somossuinos.aptcomplex.domain.apartment.Apartment;
 import somossuinos.aptcomplex.domain.balance.MonthlyBalance;
 import somossuinos.aptcomplex.DataFactory;
+import somossuinos.aptcomplex.domain.statement.MonthlyStatement;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -35,6 +36,12 @@ public class ITUtils {
     public void clearDatabase() {
         final EntityManager em = beginTx();
 
+        final List<MonthlyStatement> statements = em.createQuery("from MonthlyStatement ").getResultList();
+
+        for (final MonthlyStatement statement : statements) {
+            em.remove(statement);
+        }
+
         final List<MonthlyBalance> balances = em.createQuery("from MonthlyBalance").getResultList();
 
         for (final MonthlyBalance balance : balances) {
@@ -57,6 +64,15 @@ public class ITUtils {
 
         for (final Apartment apartment : apartments) {
             em.persist(apartment);
+        }
+
+        commitTx(em);
+        em = beginTx();
+
+        final Set<MonthlyStatement> statements = DataFactory.monthlyStatements(apartments);
+
+        for (final MonthlyStatement statement : statements) {
+            em.persist(statement);
         }
 
         commitTx(em);

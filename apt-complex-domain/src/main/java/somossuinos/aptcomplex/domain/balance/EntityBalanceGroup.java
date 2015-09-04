@@ -26,17 +26,10 @@ import java.util.Set;
  * @since 2015-08-04
  */
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "type")
 @Table(name = "entity_balance_group")
 public abstract class EntityBalanceGroup extends AbstractPersistable<Long> {
-
-    @Column(name = "description", length = 255)
-    protected String description;
-
-    public String getDescription() {
-        return description;
-    }
 
     @NotNull
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -57,8 +50,8 @@ public abstract class EntityBalanceGroup extends AbstractPersistable<Long> {
     }
 
     @NotNull
-    @Column(name = "version", nullable = false)
     @Version
+    @Column(name = "version", nullable = false)
     protected Long version;
 
     protected EntityBalanceGroup() {
@@ -70,12 +63,6 @@ public abstract class EntityBalanceGroup extends AbstractPersistable<Long> {
 
     protected static class Builder {
         protected EntityBalanceGroup group;
-
-        public Builder withDescription(final String description) {
-            if (description == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));
-            group.description = description;
-            return this;
-        }
 
         public Builder withDivergence(final BalanceDivergence divergence) {
             if (divergence == null) throw new AptComplexDomainException(new IllegalArgumentException(ExceptionMessages.PARAMETER_CANNOT_BE_NULL));

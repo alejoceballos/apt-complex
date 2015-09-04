@@ -54,8 +54,8 @@ public class Bill extends AbstractPersistable<Long> {
     }
 
     @NotNull
-    @Column(name = "version", nullable = false)
     @Version
+    @Column(name = "version", nullable = false)
     protected Long version;
 
     protected Bill() {

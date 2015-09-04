@@ -5,16 +5,18 @@
         [
             'app-i18n',
             'app-remote-api',
-            'app-view-menu-bar',
+            'app-menu-bar',
             'app-domain',
-            'app-summary',
+            'app-balance-summary',
+            'app-apartment',
             'ngRoute',
             'ui.bootstrap',
             'ui.bootstrap.tpls',
             'angular-growl',
             'ngAnimate',
             'ngResource',
-            'nsPopover'
+            'nsPopover',
+            'ngTable'
         ]);
 
     var VIEW_PATH = '/javascript/view/';
@@ -30,7 +32,10 @@
                         templateUrl: VIEW_PATH + 'about/about.tpl.html'
                     }).
                     when('/summary', {
-                        templateUrl: VIEW_PATH + 'summary/summary.tpl.html'
+                        templateUrl: VIEW_PATH + 'summary/balance-summary.tpl.html'
+                    }).
+                    when('/apartment', {
+                        templateUrl: VIEW_PATH + 'apartment/apartment.tpl.html'
                     }).
                     otherwise({
                         redirectTo: '/about'

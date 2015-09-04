@@ -1,5 +1,5 @@
 (function() {
-    var app = angular.module('app-view-menu-bar',
+    var app = angular.module('app-menu-bar',
         [
             "ngResource",
             "pascalprecht.translate",

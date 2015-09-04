@@ -149,6 +149,7 @@
                             fee: {
                                 normal: 0,
                                 surcharge: 0,
+                                discount: 0,
                                 other: 0
                             },
                             payment: 0
@@ -163,6 +164,9 @@
                                     break;
                                 case "CONDOMINIUM_SURCHARGE":
                                     result.fee.surcharge = item.value;
+                                    break;
+                                case "CONDOMINIUM_DISCOUNT":
+                                    result.fee.discount = item.value;
                                     break;
                                 default:
                                     result.fee.other = item.value;
@@ -253,6 +257,7 @@
                                 total: 0,
                                 normal: 0,
                                 surcharge: 0,
+                                discount: 0,
                                 other: 0
                             },
                             payment: 0
@@ -263,12 +268,17 @@
 
                             result.fee.normal +=  feeTotals.fee.normal;
                             result.fee.surcharge +=  feeTotals.fee.surcharge;
+                            result.fee.discount += feeTotals.fee.discount;
                             result.fee.other +=  feeTotals.fee.other;
 
                             result.payment += feeTotals.payment;
                         }
 
-                        result.fee.total =  feeTotals.fee.normal + result.fee.surcharge + feeTotals.fee.other;
+                        result.fee.total =
+                            feeTotals.fee.normal +
+                            result.fee.surcharge +
+                            result.fee.discount +
+                            feeTotals.fee.other;
 
                         return result;
                     };
@@ -306,6 +316,7 @@
                             fee: {
                                 normal: 0,
                                 surcharge: 0,
+                                discount: 0,
                                 other: 0
                             },
                             payment: 0
@@ -316,6 +327,7 @@
 
                             result.fee.normal +=  abTotals.fee.normal;
                             result.fee.surcharge +=  abTotals.fee.surcharge;
+                            result.fee.discount +=  abTotals.fee.discount;
                             result.fee.other +=  abTotals.fee.other;
                             result.payment += abTotals.payment;
                         }

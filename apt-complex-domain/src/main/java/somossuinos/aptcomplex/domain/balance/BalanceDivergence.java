@@ -10,6 +10,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 @Table(name = "balance_divergence")
 public class BalanceDivergence extends AbstractPersistable<Long> {
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private DivergenceType type;

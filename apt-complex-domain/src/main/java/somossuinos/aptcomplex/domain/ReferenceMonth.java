@@ -1,4 +1,4 @@
-package somossuinos.aptcomplex.domain.balance;
+package somossuinos.aptcomplex.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

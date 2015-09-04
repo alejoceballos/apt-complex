@@ -1,4 +1,4 @@
-<div ng-controller="SummaryController as summCtrl">
+<div ng-controller="BalanceSummaryController as summCtrl">
     <div class="page-header">
         <h1><b translate="SUMMARY_TITLE">Summary</b> <small>({{ data.referenceDate | amDateFormat:'MMMM YYYY' }})</small></h1>
     </div>
@@ -24,6 +24,10 @@
             <div class="left-right">
                 <div class="left" translate="SUMMARY_TOTAL_SURCHARGE">Surcharge</div>
                 <div class="right">{{ summCtrl.data.totals.fee.surcharge | currency }}</div>
+            </div>
+            <div class="left-right">
+                <div class="left" translate="SUMMARY_TOTAL_DISCOUNT">Discount</div>
+                <div class="right">{{ summCtrl.data.totals.fee.discount | currency }}</div>
             </div>
             <div class="left-right">
                 <div class="left" translate="SUMMARY_TOTAL_OTHERS">Surcharge</div>
@@ -77,6 +81,20 @@
                                 </li>
                                 <li class="apt-bal-popover">
                                     <div class="left-right">
+                                        <div class="left" translate="SUMMARY_DETAIL_CONDOMINIUM_DISCOUNT">Discount</div>
+                                        <div class="right">
+                                            <span ng-class="
+                                                {
+                                                    'label label-primary': aptBal.totals.fee.discount < 0,
+                                                    'label label-default': aptBal.totals.fee.discount >= 0
+                                                }">
+                                                {{ aptBal.totals.fee.discount | currency }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="apt-bal-popover">
+                                    <div class="left-right">
                                         <div class="left" translate="SUMMARY_DETAIL_OTHERS">Others</div>
                                         <div class="right">
                                             <span ng-class="
@@ -95,9 +113,9 @@
                                         <div class="right">
                                             <span ng-class="
                                                 {
-                                                    'label label-success': aptBal.totals.payment >= (aptBal.totals.fee.normal + aptBal.totals.fee.surcharge + aptBal.totals.fee.other),
-                                                    'label label-warning': aptBal.totals.payment > 0 && aptBal.totals.payment < (aptBal.totals.fee.normal + aptBal.totals.fee.surcharge + aptBal.totals.fee.other),
-                                                    'label label-danger': aptBal.totals.payment == 0 && (aptBal.totals.fee.normal + aptBal.totals.fee.surcharge + aptBal.totals.fee.other) > 0
+                                                    'label label-success': aptBal.totals.balance >= 0,
+                                                    'label label-warning': aptBal.totals.payment > 0 && aptBal.totals.payment < aptBal.totals.balance,
+                                                    'label label-danger': aptBal.totals.payment == 0 && aptBal.totals.balance > 0
                                                 }">
                                                 {{ aptBal.totals.payment | currency }}
                                             </span>

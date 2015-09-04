@@ -1,4 +1,34 @@
 -- ----------------------------------------------------------------------------
+-- MONTHLY STATEMENT
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE monthly_statement (
+  id          INT       NOT NULL AUTO_INCREMENT,
+  year        SMALLINT  NOT NULL,
+  month	      SMALLINT  NOT NULL,
+  version     BIGINT    NOT NULL DEFAULT 1,
+
+  PRIMARY KEY (id),
+
+  UNIQUE INDEX mnthlysttmnt_yr_mnth_uk (year, month)
+);
+
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE entity_statement_group (
+  id                   INT    NOT NULL AUTO_INCREMENT,
+  type                 ENUM   ('INCOMES', 'PERSONNEL', 'UTILITIES', 'CONTRACTS', 'GENERAL_SERVICES', 'BANKS', 'OTHERS') NOT NULL,
+  monthly_statement_id INT    NOT NULL,
+  version              BIGINT NOT NULL DEFAULT 1,
+
+  PRIMARY KEY (id),
+
+  CONSTRAINT fk_enttysttmntgrp_mnthlysttmnt
+  FOREIGN KEY (monthly_statement_id)
+  REFERENCES monthly_statement (id)
+);
+
+-- ----------------------------------------------------------------------------
 -- MONTHLY BALANCE
 -- ----------------------------------------------------------------------------
 
@@ -10,14 +40,13 @@ CREATE TABLE monthly_balance (
 
   PRIMARY KEY (id),
 
-  INDEX mnthlblnc_yr_mnth_idx (year, month)
+  UNIQUE INDEX mnthlblnc_yr_mnth_uk (year, month)
 );
 
 -- ----------------------------------------------------------------------------
 
 CREATE TABLE entity_balance_group (
   id                  INT           NOT NULL AUTO_INCREMENT,
-  description         VARCHAR(255),
   type                ENUM          ('INCOMES', 'PERSONNEL', 'UTILITIES', 'CONTRACTS', 'GENERAL_SERVICES', 'BANKS', 'OTHERS') NOT NULL,
   monthly_balance_id  INT           NOT NULL,
   version             BIGINT        NOT NULL DEFAULT 1,
@@ -71,21 +100,71 @@ CREATE TABLE apartment (
 
 -- ----------------------------------------------------------------------------
 
-CREATE TABLE apartment_balance (
-  id                      INT        NOT NULL AUTO_INCREMENT,
-  entity_balance_group_id INT        NOT NULL,
-  apartment_id            INT, -- Nullable, so hibernate can remove dependency with apartment before deleting it
-  apartment_number        VARCHAR(4) NOT NULL,
+CREATE TABLE apartment_balance_group (
+  id          INT NOT NULL,
+  description VARCHAR(255),
 
   PRIMARY KEY (id),
 
-  UNIQUE KEY (entity_balance_group_id, apartment_id),
+  CONSTRAINT fk_aprtmntblncgrp_enttyblncgrp
+    FOREIGN KEY (id)
+      REFERENCES entity_balance_group (id)
+);
 
-  CONSTRAINT fk_aprtmntblnc_enttyblncgrp
-    FOREIGN KEY (entity_balance_group_id)
-      REFERENCES entity_balance_group (id),
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE apartment_balance (
+  id                         INT        NOT NULL AUTO_INCREMENT,
+  apartment_balance_group_id INT        NOT NULL,
+  apartment_id               INT, -- Nullable, so hibernate can remove dependency with apartment before deleting it
+  apartment_number           VARCHAR(4) NOT NULL,
+
+  PRIMARY KEY (id),
+
+  UNIQUE KEY (apartment_balance_group_id, apartment_id),
+
+  CONSTRAINT fk_aprtmntblnc_aprtmntblncgrp
+    FOREIGN KEY (apartment_balance_group_id)
+      REFERENCES apartment_balance_group (id),
 
   CONSTRAINT fk_aprtmntblnc_aprtmnt
+    FOREIGN KEY (apartment_id)
+      REFERENCES apartment (id)
+);
+
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE apartment_statement_group (
+  id              INT           NOT NULL,
+  total_fee       DECIMAL(15,2) NOT NULL DEFAULT 0,
+  total_surcharge DECIMAL(15,2) NOT NULL DEFAULT 0,
+
+  PRIMARY KEY (id),
+
+  CONSTRAINT fk_aprtmntsttmntgrp_enttysttmntgrp
+    FOREIGN KEY (id)
+      REFERENCES entity_statement_group (id)
+);
+
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE apartment_statement (
+  id                           INT        NOT NULL AUTO_INCREMENT,
+  apartment_statement_group_id INT        NOT NULL,
+  apartment_id                 INT, -- Nullable, so hibernate can remove dependency with apartment before deleting it
+  apartment_number             VARCHAR(4) NOT NULL,
+  fee_paid                     BOOLEAN    NOT NULL DEFAULT FALSE,
+  surcharge_paid               BOOLEAN    NOT NULL DEFAULT FALSE,
+
+  PRIMARY KEY (id),
+
+  UNIQUE KEY (apartment_statement_group_id, apartment_id),
+
+  CONSTRAINT fk_aprtmntsttmnt_aprtmntsttmntgrp
+    FOREIGN KEY (apartment_statement_group_id)
+      REFERENCES apartment_statement_group (id),
+
+  CONSTRAINT fk_aprtmntsttmnt_aprtmnt
     FOREIGN KEY (apartment_id)
       REFERENCES apartment (id)
 );

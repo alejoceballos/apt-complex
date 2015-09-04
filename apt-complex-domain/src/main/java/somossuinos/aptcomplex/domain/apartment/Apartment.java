@@ -17,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ import java.util.Set;
 public class Apartment extends AbstractPersistable<Long> {
 
     @NotNull
+    @Size(min = 1, max = 4)
     @Column(name = "number", nullable = false, length = 4, unique = true)
     private String number;
 
@@ -50,8 +52,8 @@ public class Apartment extends AbstractPersistable<Long> {
     }
 
     @NotNull
-    @Column(name = "version", nullable = false)
     @Version
+    @Column(name = "version", nullable = false)
     private Long version;
 
     protected Apartment() {
