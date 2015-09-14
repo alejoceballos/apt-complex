@@ -44,6 +44,10 @@ public class MonthlyStatement extends AbstractPersistable<Long> {
     @MapKeyEnumerated(EnumType.STRING)
     private Map<BalanceType, EntityStatementGroup> statementGroups = new HashMap<>();
 
+    public Map<BalanceType, EntityStatementGroup> getStatementGroups() {
+        return statementGroups;
+    }
+
     @NotNull
     @Embedded
     private ReferenceMonth referenceMonth;

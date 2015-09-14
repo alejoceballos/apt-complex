@@ -54,7 +54,7 @@
                         }
                     ).catch(
                         function(err) {
-                            console.log("-- SummaryController: " + err);
+                            console.log("-- BalanceSummaryController: " + err);
                         }
                     );
                 }

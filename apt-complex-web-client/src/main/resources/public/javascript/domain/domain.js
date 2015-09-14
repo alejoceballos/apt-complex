@@ -12,7 +12,7 @@
         NO_NUMBER_FOUND: "No \"number\" found in object",
         NO_APARTMENT_FOUND: "No \"apartment\" found in object",
         NO_REF_DATE_FOUND: "No \"reference date\" found in object",
-        NO_BALANCE_GROUPS_FOUND: "No \"balance groups\" found in object"
+        NO_GROUPS_FOUND: "No \"groups\" found in object"
     };
 
     app.service("domainService",
@@ -238,7 +238,7 @@
                         if (obj.apartment === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_APARTMENT_FOUND;
                         this.apartment = Apartment.build(obj.apartment);
 
-                        if (this.apartment) {
+                        if (this.apartment !== undefined) {
                             this.apartmentNumber = this.apartment.number;
                         } else {
                             this.apartmentNumber = null;
@@ -361,31 +361,167 @@
                         if (obj.referenceMonth === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_REF_DATE_FOUND;
                         this.referenceMonth = obj.referenceMonth;
 
-                        if (obj.balanceGroups === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_BALANCE_GROUPS_FOUND;
+                        if (obj.balanceGroups === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_GROUPS_FOUND;
                         this.balanceGroups = obj.balanceGroups;
 
-                        if (obj.balanceGroups.INCOMES === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_BALANCE_GROUPS_FOUND + " (INCOMES)";
+                        if (obj.balanceGroups.INCOMES === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_GROUPS_FOUND + " (INCOMES)";
                         this.balanceGroups.INCOMES = ApartmentBalanceGroup.build(obj.balanceGroups.INCOMES);
 
                         this.totals = function () {
                             return this.balanceGroups.INCOMES.totals();
                         };
-
-                        this.apartmentsBalances = function() {
-                            var aptmntBalances = [];
-
-                            for (var abIdx in this.balanceGroups.INCOMES.apartmentsBalance) {
-                                var aptBal = this.balanceGroups.INCOMES.apartmentsBalance[abIdx];
-                                aptmntBalances.push(aptBal);
-                            }
-
-                            return aptmntBalances;
-                        };
                     }
+
+                    this.apartmentsBalances = function() {
+                        var aptmntBalances = [];
+
+                        for (var abIdx in this.balanceGroups.INCOMES.apartmentsBalance) {
+                            var aptBal = this.balanceGroups.INCOMES.apartmentsBalance[abIdx];
+                            aptmntBalances.push(aptBal);
+                        }
+
+                        return aptmntBalances;
+                    };
                 };
 
                 MonthlyBalance.build = function(obj) {
                     return build(MonthlyBalance, obj, false);
+                };
+
+                // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+                // APARTMENT STATEMENT
+                // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+                var ApartmentStatement = function(obj) {
+                    var DOMAIN_OBJ = "ApartmentStatement";
+
+                    if (!obj) {
+                        this.id = null;
+                        this.apartment = Apartment.build();
+                        this.feePaid = false;
+                        this.surchargePaid = false;
+                        this.apartmentNumber = this.apartment.number;
+
+                    } else {
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        this.id = obj.id;
+
+                        if (obj.feePaid === undefined) {
+                            this.feePaid = false;
+
+                        } else {
+                            this.feePaid = obj.feePaid;
+                        }
+
+                        if (obj.surchargePaid === undefined) {
+                            this.surchargePaid = false;
+
+                        } else {
+                            this.surchargePaid = obj.surchargePaid;
+                        }
+
+                        if (obj.apartment === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_APARTMENT_FOUND;
+                        this.apartment = Apartment.build(obj.apartment);
+
+                        if (this.apartment !== undefined) {
+                            this.apartmentNumber = this.apartment.number;
+
+                        } else {
+                            this.apartmentNumber = null;
+                        }
+                    }
+                };
+
+                ApartmentStatement.build = function(obj, asMap) {
+                    return build(ApartmentStatement, obj, asMap);
+                };
+
+                // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+                // APARTMENT STATEMENT GROUP
+                // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+                var ApartmentStatementGroup = function(obj) {
+                    var DOMAIN_OBJ = "ApartmentStatementGroup";
+
+                    if (!obj) {
+                        this.id = null;
+                        this.totalFee = 0;
+                        this.totalSurcharge = 0;
+                        this.apartmentsStatements = { };
+
+                    } else {
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        this.id = obj.id;
+
+                        if (obj.totalFee === undefined) {
+                            this.totalFee = 0;
+
+                        } else {
+                            this.totalFee = obj.totalFee;
+                        }
+
+                        if (obj.totalSurcharge === undefined) {
+                            this.totalSurcharge = 0;
+
+                        } else {
+                            this.totalSurcharge = obj.totalSurcharge;
+                        }
+
+                        if (!obj.apartmentsStatements) {
+                            this.apartmentsStatements = { };
+
+                        } else {
+                            this.apartmentsStatements = ApartmentStatement.build(obj.apartmentsStatements, true);
+                        }
+                    }
+                };
+
+                ApartmentStatementGroup.build = function(obj) {
+                    return build(ApartmentStatementGroup, obj, false);
+                };
+
+                // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+                // MONTHLY STATEMENT
+                // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+                var MonthlyStatement = function(obj) {
+                    var DOMAIN_OBJ = "MonthlyStatement";
+
+                    if (!obj) {
+                        this.id = null;
+                        this.referenceMonth = new Date();
+                        this.statementGroups = {
+                            INCOMES: null
+                        };
+
+                    } else {
+                        if (obj.id === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_ID_FOUND;
+                        this.id = obj.id;
+
+                        if (obj.referenceMonth === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_REF_DATE_FOUND;
+                        this.referenceMonth = obj.referenceMonth;
+
+                        if (obj.statementGroups === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_GROUPS_FOUND;
+                        this.statementGroups = obj.statementGroups;
+
+                        if (obj.statementGroups.INCOMES === undefined) throw DOMAIN_OBJ + ": " + ERROR.NO_GROUPS_FOUND + " (INCOMES)";
+                        this.statementGroups.INCOMES = ApartmentStatementGroup.build(obj.statementGroups.INCOMES);
+                    }
+
+                    this.apartmentsStatements = function() {
+                        var aptmntStatements = [];
+
+                        for (var asIdx in this.statementGroups.INCOMES.apartmentsStatements) {
+                            var aptSttmnt = this.statementGroups.INCOMES.apartmentsStatements[asIdx];
+                            aptmntStatements.push(aptSttmnt);
+                        }
+
+                        return aptmntStatements;
+                    };
+                };
+
+                MonthlyStatement.build = function(obj) {
+                    return build(MonthlyStatement, obj, false);
                 };
 
                 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -395,9 +531,14 @@
                 this.Payment = Payment;
                 this.Bill = Bill;
                 this.Apartment = Apartment;
+
                 this.ApartmentBalance = ApartmentBalance;
                 this.ApartmentBalanceGroup = ApartmentBalanceGroup;
                 this.MonthlyBalance = MonthlyBalance;
+
+                this.ApartmentStatement = ApartmentStatement;
+                this.ApartmentStatementGroup = ApartmentStatementGroup;
+                this.MonthlyStatement = MonthlyStatement;
             }
         ]
     );

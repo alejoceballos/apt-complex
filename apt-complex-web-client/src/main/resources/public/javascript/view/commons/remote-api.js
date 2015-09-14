@@ -43,6 +43,36 @@
                         );
                     }
                 };
+
+                this.statement = {
+                    summary: function(year, month) {
+                        var options = {
+                            method: 'GET',
+                            url: url + "statement/summary/year/" + year + "/month/" + month
+                        };
+
+                        $translate("REMOTE_API_STATEMENT_SUMMARY_RETRIEVING").then(function(msg) {
+                            growl.info(msg + month + "/" + year);
+                        });
+
+                        return $http(options).then(
+                            function(response) {
+                                $translate("REMOTE_API_STATEMENT_SUMMARY_RETRIEVED").then(function(msg) {
+                                    growl.success(msg);
+                                });
+                                return response.data;
+                            }
+                        ).catch(
+                            function(err) {
+                                $translate("REMOTE_API_STATEMENT_SUMMARY_ERROR_RETRIEVING").then(function(msg) {
+                                    growl.error(msg + " (" + err.status + " - " + err.statusText + ")");
+                                });
+                                console.log(err);
+                                throw err;
+                            }
+                        );
+                    }
+                };
             }
         ]
     );

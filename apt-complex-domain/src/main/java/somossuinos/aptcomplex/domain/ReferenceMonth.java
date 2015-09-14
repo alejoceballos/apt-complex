@@ -34,4 +34,12 @@ public class ReferenceMonth {
         this.year = year;
         this.month = month;
     }
+
+    @Override
+    public String toString() {
+        return "ReferenceMonth{" +
+                "year=" + year +
+                ", month=" + month +
+                '}';
+    }
 }

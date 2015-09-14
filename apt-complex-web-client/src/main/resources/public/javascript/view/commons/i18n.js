@@ -28,6 +28,8 @@
                     PAGE_TITLE: 'Apt. Complex Manager',
 
                     MENU_SUMMARY: 'Summary',
+                    MENU_STATEMENT: 'Statement',
+                    MENU_BALANCE: 'Balance',
                     MENU_INCOMES: 'Incomes',
                     MENU_FEES: 'Fees',
                     MENU_BANKS: 'Banks',
@@ -67,12 +69,18 @@
                     REMOTE_API_BALANCE_SUMMARY_RETRIEVED: 'Summary balance retrieved',
                     REMOTE_API_BALANCE_SUMMARY_ERROR_RETRIEVING: 'Error retrieving summary balance',
 
+                    REMOTE_API_STATEMENT_SUMMARY_RETRIEVING: 'Retrieving summary statement for ',
+                    REMOTE_API_STATEMENT_SUMMARY_RETRIEVED: 'Summary statement retrieved',
+                    REMOTE_API_STATEMENT_SUMMARY_ERROR_RETRIEVING: 'Error retrieving summary statement',
+
                     GENERAL_NO_DATA_TITLE: "Uh oh!",
                     GENERAL_NO_DATA_MESSAGE: "Seems that there is no data registered for this period. No problem... Just create a new monthly balance or try another period."
                 });
                 $translateProvider.translations(APP_LOCALE.PT_BR, {
                     PAGE_TITLE: 'Gerenciador de Condomínio',
                     MENU_SUMMARY: 'Resumo',
+                    MENU_STATEMENT: 'Declaração',
+                    MENU_BALANCE: 'Balancete',
                     MENU_INCOMES: 'Créditos',
                     MENU_FEES: 'Taxas',
                     MENU_BANKS: 'Bancos',
@@ -112,8 +120,12 @@
                     REMOTE_API_BALANCE_SUMMARY_RETRIEVED: 'Resumo do balancete recebido',
                     REMOTE_API_BALANCE_SUMMARY_ERROR_RETRIEVING: 'Erro ao receber o resumo do balancete',
 
+                    REMOTE_API_STATEMENT_SUMMARY_RETRIEVING: 'Recebendo o resumo da declaração de ',
+                    REMOTE_API_STATEMENT_SUMMARY_RETRIEVED: 'Resumo da declaração recebido',
+                    REMOTE_API_STATEMENT_SUMMARY_ERROR_RETRIEVING: 'Erro ao receber o resumo da declaração',
+
                     GENERAL_NO_DATA_TITLE: "Oh oh!",
-                    GENERAL_NO_DATA_MESSAGE: "Parece que não há registros para este período. Sem problema... Apenas registre um novo balancete mensal ou escolha um outro período."
+                    GENERAL_NO_DATA_MESSAGE: "Parece que não há registros para este período. Sem problemas... Apenas registre um novo balancete mensal ou escolha um outro período."
                 });
 
                 $translateProvider.preferredLanguage(APP_LOCALE.EN_US);

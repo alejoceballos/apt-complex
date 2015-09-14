@@ -76,7 +76,7 @@ public class ApartmentStatement  extends AbstractPersistable<Long> {
         }
 
         public Builder withSurchargePaid() {
-            statement.feePaid = true;
+            statement.surchargePaid = true;
             return this;
         }
 

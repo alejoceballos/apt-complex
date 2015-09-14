@@ -3,12 +3,16 @@
 
     var app = angular.module('apt-complex-app',
         [
+            // Application Modules
             'app-i18n',
             'app-remote-api',
             'app-menu-bar',
             'app-domain',
             'app-balance-summary',
+            'app-statement-summary',
             'app-apartment',
+
+            // Third-party dependencies
             'ngRoute',
             'ui.bootstrap',
             'ui.bootstrap.tpls',
@@ -31,8 +35,11 @@
                     when('/about', {
                         templateUrl: VIEW_PATH + 'about/about.tpl.html'
                     }).
-                    when('/summary', {
+                    when('/summary-balance', {
                         templateUrl: VIEW_PATH + 'summary/balance-summary.tpl.html'
+                    }).
+                    when('/summary-statement', {
+                        templateUrl: VIEW_PATH + 'summary/statement-summary.tpl.html'
                     }).
                     when('/apartment', {
                         templateUrl: VIEW_PATH + 'apartment/apartment.tpl.html'

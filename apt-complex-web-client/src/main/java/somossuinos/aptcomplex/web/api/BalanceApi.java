@@ -1,5 +1,7 @@
 package somossuinos.aptcomplex.web.api;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import somossuinos.aptcomplex.domain.balance.ApartmentBalanceGroup;
 import somossuinos.aptcomplex.domain.balance.MonthlyBalance;
 import somossuinos.aptcomplex.domain.ReferenceMonth;
@@ -18,11 +20,14 @@ import javax.ws.rs.core.MediaType;
 @Path("/balance")
 public class BalanceApi {
 
+    private Log log = LogFactory.getLog(this.getClass());
+
     @Inject
     private BalanceService service;
 
     @PostConstruct
     public void init() {
+        log.debug(">> init()");
     }
 
     @GET
@@ -31,6 +36,8 @@ public class BalanceApi {
     public ApiResult getSummaryBalance(
             @PathParam("year") final Short year,
             @PathParam("month") final Short month) {
+
+        log.debug(String.format(">> /balance/summary/year/%s/month/%s", year, month));
 
         final MonthlyBalance balance =
                 service.findMonthlyBalanceByReferenceMonth(
@@ -46,11 +53,19 @@ public class BalanceApi {
             @PathParam("year") final Short year,
             @PathParam("month") final Short month) {
 
-        final ApartmentBalanceGroup group =
-                service.findApartmentBalanceGroupByReferenceMonth(
-                        new ReferenceMonth(year, month));
+        log.debug(String.format(">> /balance/apartment/year/%s/month/%s", year, month));
 
-        return ApiResult.build(ApiResultStatusType.SUCCESS).withData(group);
+        try {
+            final ApartmentBalanceGroup group =
+                    service.findApartmentBalanceGroupByReferenceMonth(
+                            new ReferenceMonth(year, month));
+
+            return ApiResult.build(ApiResultStatusType.SUCCESS).withData(group);
+
+        } catch (final Exception e) {
+            return ApiResult.build(ApiResultStatusType.EXCEPTION).withData(e.getMessage());
+        }
+
     }
 
 }
