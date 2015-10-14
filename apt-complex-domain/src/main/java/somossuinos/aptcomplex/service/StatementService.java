@@ -24,6 +24,8 @@ public class StatementService {
 
     private Log log = LogFactory.getLog(this.getClass());
 
+    @Inject private StatementRepository repository;
+
     public StatementService() {
         if (log.isDebugEnabled()) log.debug(AopLogManager.START + AopLogManager.CONSTRUCTOR_LABEL + this.getClass().getSimpleName() + "()");
         if (log.isDebugEnabled()) log.debug(AopLogManager.END + AopLogManager.CONSTRUCTOR_LABEL + this.getClass().getSimpleName() + "()");
@@ -40,9 +42,6 @@ public class StatementService {
         if (log.isDebugEnabled()) log.debug(AopLogManager.START + this.getClass().getSimpleName() + ".destroy()");
         if (log.isDebugEnabled()) log.debug(AopLogManager.END + this.getClass().getSimpleName() + ".destroy()");
     }
-
-    @Inject
-    private StatementRepository repository;
 
     @Transactional
     public MonthlyStatement findMonthlyStatementByReferenceMonth(final ReferenceMonth month) {

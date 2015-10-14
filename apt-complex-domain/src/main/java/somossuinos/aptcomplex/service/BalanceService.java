@@ -28,8 +28,7 @@ public class BalanceService {
 
     private Log log = LogFactory.getLog(this.getClass());
 
-    @Inject
-    private BalanceRepository repository;
+    @Inject private BalanceRepository repository;
 
     public BalanceService() {
         if (log.isDebugEnabled()) log.debug(AopLogManager.START + AopLogManager.CONSTRUCTOR_LABEL + this.getClass().getSimpleName() + "()");
