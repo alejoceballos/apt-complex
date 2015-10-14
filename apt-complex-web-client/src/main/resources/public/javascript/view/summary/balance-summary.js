@@ -64,7 +64,7 @@
                         return $rootScope.data.referenceDate;
                     },
                     function(newValue, oldValue){
-                        if(newValue === oldValue){
+                        if(newValue.toString() === oldValue.toString()){
                             return;
                         }
 

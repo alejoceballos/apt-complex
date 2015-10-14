@@ -71,6 +71,34 @@
                                 throw err;
                             }
                         );
+                    },
+
+                    save: function(statement) {
+                        var options = {
+                            method: 'PUT',
+                            url: url + "statement/save",
+                            data: statement
+                        };
+
+                        $translate("REMOTE_API_STATEMENT_SUMMARY_SAVING").then(function(msg) {
+                            growl.info(msg);
+                        });
+
+                        return $http(options).then(
+                            function(response) {
+                                $translate("REMOTE_API_STATEMENT_SUMMARY_SAVED").then(function(msg) {
+                                    growl.success(msg);
+                                });
+                            }
+                        ).catch(
+                            function(err) {
+                                $translate("REMOTE_API_STATEMENT_SUMMARY_ERROR_SAVING").then(function(msg) {
+                                    growl.error(msg + " (" + err.status + " - " + err.statusText + ")");
+                                });
+                                console.log(err);
+                                throw err;
+                            }
+                        );
                     }
                 };
             }

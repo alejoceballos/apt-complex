@@ -18,19 +18,23 @@ public class ApiResult {
         this.status = status.name();
     }
 
-    public static ApiResultBuilder build(final ApiResultStatusType status) {
-        return new ApiResultBuilder(new ApiResult(status));
-    }
-
-    public static class ApiResultBuilder {
+    public static class Builder {
         private ApiResult result;
 
-        protected ApiResultBuilder(final ApiResult result) {
-            this.result = result;
+        private Builder(final ApiResultStatusType status) {
+            this.result = new ApiResult(status);
         }
 
-        public ApiResult withData(final Object data) {
+        public static Builder get(final ApiResultStatusType status) {
+            return new Builder(status);
+        }
+
+        public Builder withData(final Object data) {
             this.result.data = data;
+            return this;
+        }
+
+        public ApiResult build() {
             return this.result;
         }
     }

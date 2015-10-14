@@ -73,6 +73,10 @@
                     REMOTE_API_STATEMENT_SUMMARY_RETRIEVED: 'Summary statement retrieved',
                     REMOTE_API_STATEMENT_SUMMARY_ERROR_RETRIEVING: 'Error retrieving summary statement',
 
+                    REMOTE_API_STATEMENT_SUMMARY_SAVING: 'Saving summary statement for ',
+                    REMOTE_API_STATEMENT_SUMMARY_SAVED: 'Summary statement saved',
+                    REMOTE_API_STATEMENT_SUMMARY_ERROR_SAVING: 'Error saving summary statement',
+
                     GENERAL_NO_DATA_TITLE: "Uh oh!",
                     GENERAL_NO_DATA_MESSAGE: "Seems that there is no data registered for this period. No problem... Just create a new monthly balance or try another period."
                 });
@@ -123,6 +127,10 @@
                     REMOTE_API_STATEMENT_SUMMARY_RETRIEVING: 'Recebendo o resumo da declaração de ',
                     REMOTE_API_STATEMENT_SUMMARY_RETRIEVED: 'Resumo da declaração recebido',
                     REMOTE_API_STATEMENT_SUMMARY_ERROR_RETRIEVING: 'Erro ao receber o resumo da declaração',
+
+                    REMOTE_API_STATEMENT_SUMMARY_SAVING: 'Gravando o resumo da declaração de ',
+                    REMOTE_API_STATEMENT_SUMMARY_SAVED: 'Resumo da declaração gravado',
+                    REMOTE_API_STATEMENT_SUMMARY_ERROR_SAVING: 'Erro ao gravar o resumo da declaração',
 
                     GENERAL_NO_DATA_TITLE: "Oh oh!",
                     GENERAL_NO_DATA_MESSAGE: "Parece que não há registros para este período. Sem problemas... Apenas registre um novo balancete mensal ou escolha um outro período."
