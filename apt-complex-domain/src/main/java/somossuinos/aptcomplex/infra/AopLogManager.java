@@ -31,20 +31,20 @@ public class AopLogManager {
     public static final String MILLISECONDS_LABEL = " ms";
 
     public AopLogManager() {
-        if (log.isDebugEnabled()) log.debug(AopLogManager.START + AopLogManager.CONSTRUCTOR_LABEL + this.getClass().getSimpleName() + "()");
-        if (log.isDebugEnabled()) log.debug(AopLogManager.END + AopLogManager.CONSTRUCTOR_LABEL + this.getClass().getSimpleName() + "()");
+        if (log.isDebugEnabled()) log.debug(START + CONSTRUCTOR_LABEL + this.getClass().getSimpleName() + "()");
+        if (log.isDebugEnabled()) log.debug(END + CONSTRUCTOR_LABEL + this.getClass().getSimpleName() + "()");
     }
 
     @PostConstruct
     public void init() {
-        if (log.isDebugEnabled()) log.debug(AopLogManager.START + this.getClass().getSimpleName() + ".init()");
-        if (log.isDebugEnabled()) log.debug(AopLogManager.END + this.getClass().getSimpleName() + ".init()");
+        if (log.isDebugEnabled()) log.debug(START + this.getClass().getSimpleName() + ".init()");
+        if (log.isDebugEnabled()) log.debug(END + this.getClass().getSimpleName() + ".init()");
     }
 
     @PreDestroy
     public void destroy() {
-        if (log.isDebugEnabled()) log.debug(AopLogManager.START + this.getClass().getSimpleName() + ".destroy()");
-        if (log.isDebugEnabled()) log.debug(AopLogManager.END + this.getClass().getSimpleName() + ".destroy()");
+        if (log.isDebugEnabled()) log.debug(START + this.getClass().getSimpleName() + ".destroy()");
+        if (log.isDebugEnabled()) log.debug(END + this.getClass().getSimpleName() + ".destroy()");
     }
 
     @Pointcut("execution(* somossuinos.aptcomplex.service..*.*(..))")
