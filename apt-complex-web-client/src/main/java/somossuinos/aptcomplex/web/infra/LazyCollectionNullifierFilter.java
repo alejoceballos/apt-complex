@@ -1,5 +1,6 @@
 package somossuinos.aptcomplex.web.infra;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import somossuinos.aptcomplex.infra.AopLogManager;
@@ -45,12 +46,17 @@ public class LazyCollectionNullifierFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext containerRequestContext, ContainerResponseContext containerResponseContext) throws IOException {
         if (log.isDebugEnabled()) log.debug(AopLogManager.START + this.getClass().getSimpleName() + ".filter(..)");
+        final StopWatch sw = new StopWatch();
+        sw.start();
 
-        if (containerResponseContext.getEntity() instanceof ApiResult) {
-            final LazyCollectionNullifier nullifier = new LazyCollectionNullifier();
-            nullifier.execute(((ApiResult) containerResponseContext.getEntity()).getData());
+        try {
+            if (containerResponseContext.getEntity() instanceof ApiResult) {
+                final LazyCollectionNullifier nullifier = new LazyCollectionNullifier();
+                nullifier.execute(((ApiResult) containerResponseContext.getEntity()).getData());
+            }
+        } finally {
+            sw.stop();
+            if (log.isDebugEnabled()) log.debug(AopLogManager.END + this.getClass().getSimpleName() + ".filter(..). " + AopLogManager.ELAPSED_LABEL + (sw.getTime()) + AopLogManager.MILLISECONDS_LABEL);
         }
-
-        if (log.isDebugEnabled()) log.debug(AopLogManager.END + this.getClass().getSimpleName() + ".filter(..)");
     }
 }

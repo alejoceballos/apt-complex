@@ -1,5 +1,6 @@
 package somossuinos.aptcomplex.infra;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -9,7 +10,6 @@ import org.aspectj.lang.annotation.Pointcut;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Calendar;
 
 /**
  * @author ceballos
@@ -39,16 +39,15 @@ public class AopLogManager {
         final String logId = className + "." + methodName + "(..)";
         if (log.isDebugEnabled()) log.debug(START + logId);
 
-        final long start = Calendar.getInstance().getTimeInMillis();
+        final StopWatch sw = new StopWatch();
+        sw.start();
 
         try {
             return pjp.proceed(pjp.getArgs());
 
         } finally {
-            if (log.isDebugEnabled()) {
-                final long end = Calendar.getInstance().getTimeInMillis();
-                log.debug(END + logId + ". " + ELAPSED_LABEL + (end - start) + MILLISECONDS_LABEL);
-            }
+            sw.stop();
+            if (log.isDebugEnabled()) log.debug(END + logId + ". " + ELAPSED_LABEL + (sw.getTime()) + MILLISECONDS_LABEL);
         }
     }
 
